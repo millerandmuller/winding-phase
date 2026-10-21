@@ -1,0 +1,120 @@
+{
+  "pairs_scored": 373,
+  "not_covered": 44,
+  "by_pair_length_px": [
+    {
+      "length_px": "0-8",
+      "n": 283,
+      "plus1": 0.76,
+      "zero": 0.124,
+      "minus1": 0.053,
+      "other": 0.064
+    },
+    {
+      "length_px": "8-10",
+      "n": 57,
+      "plus1": 0.842,
+      "zero": 0.07,
+      "minus1": 0.0,
+      "other": 0.088
+    },
+    {
+      "length_px": "10-12",
+      "n": 16,
+      "plus1": 0.812,
+      "zero": 0.0,
+      "minus1": 0.0,
+      "other": 0.188
+    },
+    {
+      "length_px": "12-14",
+      "n": 8,
+      "plus1": 0.625,
+      "zero": 0.125,
+      "minus1": 0.0,
+      "other": 0.25
+    },
+    {
+      "length_px": "14-16",
+      "n": 3,
+      "plus1": 0.667,
+      "zero": 0.0,
+      "minus1": 0.0,
+      "other": 0.333
+    },
+    {
+      "length_px": "16-20",
+      "n": 3,
+      "plus1": 1.0,
+      "zero": 0.0,
+      "minus1": 0.0,
+      "other": 0.0
+    },
+    {
+      "length_px": "20-30",
+      "n": 3,
+      "plus1": 1.0,
+      "zero": 0.0,
+      "minus1": 0.0,
+      "other": 0.0
+    }
+  ],
+  "by_radius_mm": [
+    {
+      "radius_mm": "0-2",
+      "n": 21,
+      "plus1": 0.857,
+      "zero": 0.048,
+      "minus1": 0.048,
+      "other": 0.048
+    },
+    {
+      "radius_mm": "2-4",
+      "n": 64,
+      "plus1": 0.797,
+      "zero": 0.062,
+      "minus1": 0.016,
+      "other": 0.125
+    },
+    {
+      "radius_mm": "4-6",
+      "n": 99,
+      "plus1": 0.879,
+      "zero": 0.081,
+      "minus1": 0.01,
+      "other": 0.03
+    },
+    {
+      "radius_mm": "6-8",
+      "n": 59,
+      "plus1": 0.763,
+      "zero": 0.034,
+      "minus1": 0.119,
+      "other": 0.085
+    },
+    {
+      "radius_mm": "8-10",
+      "n": 55,
+      "plus1": 0.655,
+      "zero": 0.291,
+      "minus1": 0.0,
+      "other": 0.055
+    },
+    {
+      "radius_mm": "10-15",
+      "n": 29,
+      "plus1": 0.759,
+      "zero": 0.207,
+      "minus1": 0.0,
+      "other": 0.034
+    },
+    {
+      "radius_mm": "15-100",
+      "n": 46,
+      "plus1": 0.652,
+      "zero": 0.065,
+      "minus1": 0.109,
+      "other": 0.174
+    }
+  ]
+}

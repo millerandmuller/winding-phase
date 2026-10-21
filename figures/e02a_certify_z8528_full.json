@@ -1,0 +1,33 @@
+{
+  "z0": 8528,
+  "crop": null,
+  "pairs": 820,
+  "prominence": 0.08,
+  "unwrap_alone": {
+    "coverage": 0.8463,
+    "precision": 0.7781,
+    "n": 694
+  },
+  "ridges_alone (predict ridges+1 == 1)": {
+    "coverage": 1.0,
+    "precision": 0.7183,
+    "n": 820
+  },
+  "ridge_count_histogram": {
+    "0": 589,
+    "1": 230,
+    "2": 1
+  },
+  "certificate (unwrap == ridges+1 == 1)": {
+    "coverage": 0.4793,
+    "precision": 0.9695,
+    "n": 393
+  },
+  "agree_any_value": {
+    "coverage": 0.4793,
+    "precision": 1.0,
+    "n": 393
+  },
+  "unwrap_1_but_ridges_not_0": 159,
+  "ridges_0_but_unwrap_not_1": 109
+}

@@ -1,0 +1,148 @@
+{
+  "z0": 8528,
+  "crop": 800,
+  "baseline": {
+    "pairs": 417,
+    "covered": 373,
+    "coverage": 0.8945,
+    "precision": 0.7748
+  },
+  "gate_frac_max": [
+    {
+      "threshold": 0.5,
+      "coverage": 0.8945,
+      "precision": 0.7748,
+      "n": 373
+    },
+    {
+      "threshold": 0.3,
+      "coverage": 0.8681,
+      "precision": 0.7873,
+      "n": 362
+    },
+    {
+      "threshold": 0.2,
+      "coverage": 0.8609,
+      "precision": 0.7855,
+      "n": 359
+    },
+    {
+      "threshold": 0.15,
+      "coverage": 0.8441,
+      "precision": 0.7869,
+      "n": 352
+    },
+    {
+      "threshold": 0.1,
+      "coverage": 0.7074,
+      "precision": 0.7966,
+      "n": 295
+    },
+    {
+      "threshold": 0.05,
+      "coverage": 0.4652,
+      "precision": 0.7835,
+      "n": 194
+    }
+  ],
+  "gate_amp_min": [
+    {
+      "threshold": 0.0,
+      "coverage": 0.8945,
+      "precision": 0.7748,
+      "n": 373
+    },
+    {
+      "threshold": 0.2,
+      "coverage": 0.8945,
+      "precision": 0.7748,
+      "n": 373
+    },
+    {
+      "threshold": 0.3,
+      "coverage": 0.8945,
+      "precision": 0.7748,
+      "n": 373
+    },
+    {
+      "threshold": 0.4,
+      "coverage": 0.8945,
+      "precision": 0.7748,
+      "n": 373
+    },
+    {
+      "threshold": 0.5,
+      "coverage": 0.8945,
+      "precision": 0.7748,
+      "n": 373
+    },
+    {
+      "threshold": 0.6,
+      "coverage": 0.8897,
+      "precision": 0.7763,
+      "n": 371
+    }
+  ],
+  "gate_resdist_min": [
+    {
+      "threshold": 0.0,
+      "coverage": 0.8945,
+      "precision": 0.7748,
+      "n": 373
+    },
+    {
+      "threshold": 2.0,
+      "coverage": 0.8609,
+      "precision": 0.7799,
+      "n": 359
+    },
+    {
+      "threshold": 4.0,
+      "coverage": 0.8129,
+      "precision": 0.7965,
+      "n": 339
+    },
+    {
+      "threshold": 8.0,
+      "coverage": 0.6043,
+      "precision": 0.8016,
+      "n": 252
+    },
+    {
+      "threshold": 12.0,
+      "coverage": 0.3621,
+      "precision": 0.8874,
+      "n": 151
+    }
+  ],
+  "gate_combo": [
+    {
+      "frac_max": 0.15,
+      "amp_min": 0.2,
+      "coverage": 0.8441,
+      "precision": 0.7869,
+      "n": 352
+    },
+    {
+      "frac_max": 0.15,
+      "amp_min": 0.3,
+      "coverage": 0.8441,
+      "precision": 0.7869,
+      "n": 352
+    },
+    {
+      "frac_max": 0.15,
+      "amp_min": 0.4,
+      "coverage": 0.8441,
+      "precision": 0.7869,
+      "n": 352
+    },
+    {
+      "frac_max": 0.15,
+      "amp_min": 0.5,
+      "coverage": 0.8441,
+      "precision": 0.7869,
+      "n": 352
+    }
+  ]
+}

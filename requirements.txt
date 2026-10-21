@@ -6,3 +6,4 @@ requests
 numpy
 matplotlib
 scipy
+scikit-image

@@ -2,7 +2,7 @@
 
 **Can Lasagna's cosine channel be treated as a wrapped phase and unwrapped, InSAR style, into winding constraints for the villa spiral fitter?**
 
-Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconstruction works and tracks the sheets; the residues (fringe dislocations) form a uniform, z-persistent background rather than marking merges or tears. No constraints exported yet, nothing scored against a fit.
+Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconstruction works and tracks the sheets; the residues form a uniform, z-persistent background rather than marking merges or tears. First score against PCU's held-out ladders: a plain 2D unwrap gets 77.8% of adjacent-sheet pairs right at 85% coverage; where it agrees with a local ridge count, 97.0% at 48% coverage. No constraints exported yet, nothing scored against a fit.
 
 ## What is here
 
@@ -16,6 +16,10 @@ Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconst
 | `e01_residue_analysis.py` | Residue density by local fringe period and by distance from the umbilicus; dipole share |
 | `e01_papyrus_split.py` | Residues on vs off papyrus, with the m7 surface prediction as the mask |
 | `e01_zoom.py` | Zoomed windows at native pixels, residues over the CT |
+| `e02a_baseline.py` | 2D unwrap of one held-out slice, scored on PCU's gold ladders |
+| `e02a_gates.py` | Precision against coverage for three confidence gates |
+| `e02a_failures.py` | Failing pairs drawn over the phase; failure rate by pair length and radius |
+| `e02a_certify.py` | Ridge-count certificate and its agreement with the unwrap |
 
 ## Run
 
@@ -58,6 +62,25 @@ Resolution matters, orientation of the normals does not. At level 2 (37 µm per 
 **Reading.** The residues are not noise and not a border or mask effect: they persist along z and survive smoothing. But they do not localise on anything visible either. Their density is the same on and off papyrus, flat across the scroll, and independent of Lasagna's confidence. On this slice the field has a uniform background of fringe dislocations, about four per 1,000 cells, running through z. So the residue map on its own is not a missed-sheet detector here. For unwrapping that background is what a minimum-cost-flow solver has to route branch cuts around; whether the cuts land on real sheet ambiguities is a question for scoring against the PCU held-out ladders, not for this figure.
 
 Not done: no unwrapping, no constraints exported, no comparison with a fit. One slice of one scroll.
+
+## First number against PCU's held-out ladders (E-02a, same day)
+
+PCU publishes 3,426 gold ladders on eight held-out slices of PHerc0826 (`gold0826_heldout8.json`, SHA256 `edc56561...`). Each ladder is a chain of points on consecutive adjacent sheets, so every consecutive pair is a "+1 winding" test. Coordinates are level-0 voxels. On the first held-out slice (z 8528, full width, level 1) the pipeline is: wrapped phase as above, then an off-the-shelf 2D unwrap (scikit-image, reliability sorting), then the unwrapped phase difference between the two points of each pair, rounded to windings.
+
+| Estimate | Coverage | Precision (== +1) |
+|---|---|---|
+| 2D unwrap alone (`e02a_baseline.py`) | 85% | 77.8% |
+| Interior ridge count alone (`e02a_certify.py`: adjacent sheets should show no cosine ridge between the points) | 100% | 71.8% |
+| **Certificate: unwrap and ridge count agree** | **48%** | **97.0%** |
+| PCU, same scroll, their own numbers | 70% | 99.6% (Paris 4) |
+
+Where the unwrap alone fails: mostly a missed wrap (68 of 694 pairs round to 0) or a reversed direction (46 round to -1); failures sit on the shortest pairs and are not flagged by fractional phase error, local amplitude, or distance to the nearest residue (`e02a_gates.py`). Preprocessing moves the plain unwrap by a few points only (contrast window 15 to 60 px, smoothing 0.3 to 1.5 px: 67% to 82%). The certificate loses coverage mainly to false interior ridges (230 of 820 pairs show one extra peak on what the gold says is an adjacent-sheet pair).
+
+![pairs](figures/e02a_failures_z8528_crop800.png)
+
+*Gold pairs over the wrapped phase, 800-pixel crop: green +1 (right), orange 0 (missed wrap), blue -1 (reversed), red other, grey not covered by the unwrap.*
+
+Not done: the other seven held-out slices, any use of the normals or grad_mag as a third vote, 3D consistency, a fit. One slice.
 
 ## Data
 
