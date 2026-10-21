@@ -1,0 +1,8 @@
+zarr>=3,<4
+numcodecs
+fsspec
+aiohttp
+requests
+numpy
+matplotlib
+scipy
