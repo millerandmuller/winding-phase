@@ -1,0 +1,111 @@
+{
+  "z0": 9296,
+  "crop": null,
+  "pairs_total": 1581,
+  "density_scale_used": 1.23,
+  "median_raw_density_integral_k1": 0.8013,
+  "per_k": {
+    "1": {
+      "pairs": 891,
+      "unwrap_acc": 0.7666,
+      "unwrap_covered": 0.8799,
+      "ridges_acc": 0.7183,
+      "density_acc": 1.0
+    },
+    "2": {
+      "pairs": 457,
+      "unwrap_acc": 0.6717,
+      "unwrap_covered": 0.8665,
+      "ridges_acc": 0.8271,
+      "density_acc": 0.9497
+    },
+    "3": {
+      "pairs": 233,
+      "unwrap_acc": 0.5939,
+      "unwrap_covered": 0.8455,
+      "ridges_acc": 0.9185,
+      "density_acc": 0.8412
+    }
+  },
+  "unwrap+ridges": {
+    "coverage": 0.4965,
+    "precision": 0.9745,
+    "n": 785,
+    "by_k": {
+      "1": {
+        "accepted": 434,
+        "correct": 424
+      },
+      "2": {
+        "accepted": 236,
+        "correct": 229
+      },
+      "3": {
+        "accepted": 115,
+        "correct": 112
+      }
+    }
+  },
+  "unwrap+density": {
+    "coverage": 0.599,
+    "precision": 0.9968,
+    "n": 947,
+    "by_k": {
+      "1": {
+        "accepted": 601,
+        "correct": 601
+      },
+      "2": {
+        "accepted": 252,
+        "correct": 250
+      },
+      "3": {
+        "accepted": 94,
+        "correct": 93
+      }
+    }
+  },
+  "ridges+density (unwrap ignored for agreement, scored on unwrap)": {
+    "coverage": 0.6496,
+    "precision": 0.7128,
+    "n": 1027,
+    "by_k": {
+      "1": {
+        "accepted": 559,
+        "correct": 424
+      },
+      "2": {
+        "accepted": 312,
+        "correct": 216
+      },
+      "3": {
+        "accepted": 156,
+        "correct": 92
+      }
+    }
+  },
+  "all three": {
+    "coverage": 0.4617,
+    "precision": 1.0,
+    "n": 730,
+    "by_k": {
+      "1": {
+        "accepted": 424,
+        "correct": 424
+      },
+      "2": {
+        "accepted": 215,
+        "correct": 215
+      },
+      "3": {
+        "accepted": 91,
+        "correct": 91
+      }
+    }
+  },
+  "ridges+density scored on ridges (no unwrap needed)": {
+    "coverage": 0.7464,
+    "precision": 0.9983,
+    "n": 1180
+  }
+}

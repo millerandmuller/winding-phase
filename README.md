@@ -66,39 +66,52 @@ Not done: no unwrapping, no constraints exported, no comparison with a fit. One 
 
 ## Scored against PCU's held-out ladders (E-02a, same day)
 
-PCU publishes 3,426 gold ladders on eight held-out slices of PHerc0826 (`gold0826_heldout8.json`, SHA256 `edc56561...`): chains of points on consecutive sheets, level-0 coordinates. Points one rung apart are a true 1-wrap pair; two and three rungs apart give true 2- and 3-wrap pairs, so the same slice carries negatives for the +1 test. First held-out slice (z 8528), full width, level 1: 820 one-wrap, 391 two-wrap, 200 three-wrap pairs.
+PCU publishes 3,426 gold ladders on eight held-out slices of PHerc0826 (`gold0826_heldout8.json`, SHA256 `edc56561...`): chains of points on consecutive sheets, level-0 coordinates, z 8528 to 9424 in steps of 128. Points one rung apart are a true 1-wrap pair; two and three rungs apart give true 2- and 3-wrap pairs, so the same slices carry negatives for the +1 test. All eight slices, full width, level 1: 11,463 pairs (6,628 one-wrap, 3,202 two-wrap, 1,633 three-wrap).
 
 Three estimates of the winding difference per pair, each independent of the others:
 
 - **unwrap**: wrapped phase as above, unwrapped in 2D with scikit-image (reliability sorting), difference between the two points rounded to windings;
 - **ridges**: interior maxima of the smoothed cosine along the segment, plus one;
-- **density**: Lasagna's grad_mag (windings per base voxel, base = level 1, decoded per the manifest) integrated along the segment, times a calibration of 1.23 (the integral over one-wrap pairs has a median of 0.80, fitted on an 800-pixel crop, applied here unchanged).
+- **density**: Lasagna's grad_mag (windings per base voxel, base = level 1, decoded per the manifest) integrated along the segment, times a calibration of 1.23. The calibration was fitted once, on an 800-pixel crop of the first slice (one-wrap median integral 0.81), and applied to all eight unchanged; the per-slice one-wrap median runs from 0.78 to 0.82.
 
 | Estimate | 1-wrap accuracy | 2-wrap | 3-wrap |
 |---|---|---|---|
-| unwrap (on its 78 to 85% covered pairs) | 79.4% | 67.7% | 59.0% |
-| ridges | 71.8% | 82.1% | 85.0% |
-| density | 100% | 92.6% | 83.0% |
+| unwrap (on its 83 to 86% covered pairs) | 80.5% | 70.5% | 61.3% |
+| ridges | 73.0% | 82.7% | 87.8% |
+| density | 100% | 92.6% | 82.2% |
 
-Certificates, over all 1,411 pairs, any k:
+Certificates, pooled over all 11,463 pairs of the eight slices, any k (counts summed, not rates averaged):
 
 | Votes that must agree | Coverage | Precision of the agreed value |
 |---|---|---|
-| unwrap, ridges | 48% | 98.2% |
-| unwrap, density | 60% | 98.5% |
-| ridges, density (no unwrap needed) | **75%** | **98.7%** |
-| all three | 46% | **99.8%** (643 of 644; the one miss is a 3-wrap pair) |
+| unwrap, ridges | 51% | 98.2% |
+| unwrap, density | 63% | 98.7% |
+| ridges, density (no unwrap needed) | **75%** | **99.0%** (8,561 of 8,650) |
+| all three | 48% | **99.7%** (5,475 of 5,490) |
 | PCU's own certificate, Paris 4, 1-wrap set | 70% | 99.6% |
 
-On an 800-pixel crop of the same slice (`figures/e02a_kwrap_z8528_crop800.json`): all three 100% of 351, ridges plus density 97.5% at 72%.
+Per slice (`figures/e02a_heldout8_pooled.json`, one JSON per slice beside it):
+
+| z | pairs | all three | ridges, density |
+|---|---|---|---|
+| 8528 | 1,411 | 99.8% at 46% | 98.7% at 75% |
+| 8656 | 1,338 | 99.4% at 46% | 98.0% at 77% |
+| 8784 | 1,497 | 99.3% at 50% | 98.6% at 75% |
+| 8912 | 1,595 | 100% at 49% | 99.3% at 74% |
+| 9040 | 1,288 | 100% at 52% | 100% at 78% |
+| 9168 | 1,258 | 100% at 48% | 99.5% at 78% |
+| 9296 | 1,581 | 100% at 46% | 99.8% at 75% |
+| 9424 | 1,495 | 99.3% at 47% | 97.9% at 74% |
+
+The worst slice for the three-vote certificate is 99.3%; its coverage sits between 46% and 52% everywhere. The three-vote certificate misses 15 pairs in 5,490; all 15 are 3-wrap pairs on which the three estimates agree on a wrong count. On 1- and 2-wrap pairs it has no miss in 8 slices.
 
 What the plain unwrap gets wrong: missed wraps (0) and reversed direction (-1) on the shortest pairs; not flagged by fractional phase error, amplitude, or distance to the nearest residue (`e02a_gates.py`), and only a few points sensitive to the contrast window and smoothing. Normals are an unoriented axis (villa Lasagna docs); they are oriented outward from the umbilicus here, interpolated as a structure tensor, and a zero grad_mag is treated as an invalid sample.
 
 ![pairs](figures/e02a_failures_z8528_crop800.png)
 
-*One-wrap gold pairs over the wrapped phase, 800-pixel crop: green +1 (right), orange 0 (missed wrap), blue -1 (reversed), red other, grey not covered by the unwrap.*
+*One-wrap gold pairs over the wrapped phase, 800-pixel crop of z 8528: green +1 (right), orange 0 (missed wrap), blue -1 (reversed), red other, grey not covered by the unwrap.*
 
-Not done: the other seven held-out slices, 3D consistency across slices, a fit. One slice.
+Not done: 3D consistency across slices, a fit, slips per wrap. Reproduce with `e02a_kwrap.py` per slice (flags in its docstring: window 30, smooth 0.3, prominence 0.08, base level 1, density scale 1.23) and `e02a_heldout8.py` to pool.
 
 ## Data
 
