@@ -96,7 +96,7 @@ def wrapped_phase(
     c_norm, contrast = normalise_contrast(gaussian_filter(cos, smooth_sigma), window)
     valid = inside & (contrast > min_contrast)
     if grad_mag is not None:
-        valid &= grad_mag > min_grad_mag
+        valid &= grad_mag > min_grad_mag  # zero grad_mag marks an invalid normal sample
     c_norm = np.where(valid, c_norm, 0.0).astype(np.float32)
 
     ry, rx = riesz_transform(c_norm)

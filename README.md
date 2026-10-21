@@ -2,7 +2,7 @@
 
 **Can Lasagna's cosine channel be treated as a wrapped phase and unwrapped, InSAR style, into winding constraints for the villa spiral fitter?**
 
-Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconstruction works and tracks the sheets; the residues form a uniform, z-persistent background rather than marking merges or tears. First score against PCU's held-out ladders: a plain 2D unwrap gets 77.8% of adjacent-sheet pairs right at 85% coverage; where it agrees with a local ridge count, 97.0% at 48% coverage. No constraints exported yet, nothing scored against a fit.
+Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconstruction works and tracks the sheets; the residues form a uniform, z-persistent background rather than marking merges or tears. Scored on PCU's first held-out slice with 1-, 2- and 3-wrap gold pairs: three independent winding estimates (2D unwrap, ridge count, integrated grad_mag density) agree on 46% of pairs and are then 99.8% right; ridge count plus density alone cover 75% at 98.7%. No constraints exported yet, nothing scored against a fit.
 
 ## What is here
 
@@ -19,7 +19,8 @@ Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconst
 | `e02a_baseline.py` | 2D unwrap of one held-out slice, scored on PCU's gold ladders |
 | `e02a_gates.py` | Precision against coverage for three confidence gates |
 | `e02a_failures.py` | Failing pairs drawn over the phase; failure rate by pair length and radius |
-| `e02a_certify.py` | Ridge-count certificate and its agreement with the unwrap |
+| `e02a_certify.py` | Ridge-count and density votes on 1-wrap pairs |
+| `e02a_kwrap.py` | All votes and certificates on 1-, 2- and 3-wrap pairs (the scoreboard above) |
 
 ## Run
 
@@ -63,24 +64,41 @@ Resolution matters, orientation of the normals does not. At level 2 (37 µm per 
 
 Not done: no unwrapping, no constraints exported, no comparison with a fit. One slice of one scroll.
 
-## First number against PCU's held-out ladders (E-02a, same day)
+## Scored against PCU's held-out ladders (E-02a, same day)
 
-PCU publishes 3,426 gold ladders on eight held-out slices of PHerc0826 (`gold0826_heldout8.json`, SHA256 `edc56561...`). Each ladder is a chain of points on consecutive adjacent sheets, so every consecutive pair is a "+1 winding" test. Coordinates are level-0 voxels. On the first held-out slice (z 8528, full width, level 1) the pipeline is: wrapped phase as above, then an off-the-shelf 2D unwrap (scikit-image, reliability sorting), then the unwrapped phase difference between the two points of each pair, rounded to windings.
+PCU publishes 3,426 gold ladders on eight held-out slices of PHerc0826 (`gold0826_heldout8.json`, SHA256 `edc56561...`): chains of points on consecutive sheets, level-0 coordinates. Points one rung apart are a true 1-wrap pair; two and three rungs apart give true 2- and 3-wrap pairs, so the same slice carries negatives for the +1 test. First held-out slice (z 8528), full width, level 1: 820 one-wrap, 391 two-wrap, 200 three-wrap pairs.
 
-| Estimate | Coverage | Precision (== +1) |
+Three estimates of the winding difference per pair, each independent of the others:
+
+- **unwrap**: wrapped phase as above, unwrapped in 2D with scikit-image (reliability sorting), difference between the two points rounded to windings;
+- **ridges**: interior maxima of the smoothed cosine along the segment, plus one;
+- **density**: Lasagna's grad_mag (windings per base voxel, base = level 1, decoded per the manifest) integrated along the segment, times a calibration of 1.23 (the integral over one-wrap pairs has a median of 0.80, fitted on an 800-pixel crop, applied here unchanged).
+
+| Estimate | 1-wrap accuracy | 2-wrap | 3-wrap |
+|---|---|---|---|
+| unwrap (on its 78 to 85% covered pairs) | 79.4% | 67.7% | 59.0% |
+| ridges | 71.8% | 82.1% | 85.0% |
+| density | 100% | 92.6% | 83.0% |
+
+Certificates, over all 1,411 pairs, any k:
+
+| Votes that must agree | Coverage | Precision of the agreed value |
 |---|---|---|
-| 2D unwrap alone (`e02a_baseline.py`) | 85% | 77.8% |
-| Interior ridge count alone (`e02a_certify.py`: adjacent sheets should show no cosine ridge between the points) | 100% | 71.8% |
-| **Certificate: unwrap and ridge count agree** | **48%** | **97.0%** |
-| PCU, same scroll, their own numbers | 70% | 99.6% (Paris 4) |
+| unwrap, ridges | 48% | 98.2% |
+| unwrap, density | 60% | 98.5% |
+| ridges, density (no unwrap needed) | **75%** | **98.7%** |
+| all three | 46% | **99.8%** (643 of 644; the one miss is a 3-wrap pair) |
+| PCU's own certificate, Paris 4, 1-wrap set | 70% | 99.6% |
 
-Where the unwrap alone fails: mostly a missed wrap (68 of 694 pairs round to 0) or a reversed direction (46 round to -1); failures sit on the shortest pairs and are not flagged by fractional phase error, local amplitude, or distance to the nearest residue (`e02a_gates.py`). Preprocessing moves the plain unwrap by a few points only (contrast window 15 to 60 px, smoothing 0.3 to 1.5 px: 67% to 82%). The certificate loses coverage mainly to false interior ridges (230 of 820 pairs show one extra peak on what the gold says is an adjacent-sheet pair).
+On an 800-pixel crop of the same slice (`figures/e02a_kwrap_z8528_crop800.json`): all three 100% of 351, ridges plus density 97.5% at 72%.
+
+What the plain unwrap gets wrong: missed wraps (0) and reversed direction (-1) on the shortest pairs; not flagged by fractional phase error, amplitude, or distance to the nearest residue (`e02a_gates.py`), and only a few points sensitive to the contrast window and smoothing. Normals are an unoriented axis (villa Lasagna docs); they are oriented outward from the umbilicus here, interpolated as a structure tensor, and a zero grad_mag is treated as an invalid sample.
 
 ![pairs](figures/e02a_failures_z8528_crop800.png)
 
-*Gold pairs over the wrapped phase, 800-pixel crop: green +1 (right), orange 0 (missed wrap), blue -1 (reversed), red other, grey not covered by the unwrap.*
+*One-wrap gold pairs over the wrapped phase, 800-pixel crop: green +1 (right), orange 0 (missed wrap), blue -1 (reversed), red other, grey not covered by the unwrap.*
 
-Not done: the other seven held-out slices, any use of the normals or grad_mag as a third vote, 3D consistency, a fit. One slice.
+Not done: the other seven held-out slices, 3D consistency across slices, a fit. One slice.
 
 ## Data
 

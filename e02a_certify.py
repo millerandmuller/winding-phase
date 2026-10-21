@@ -42,6 +42,16 @@ def interior_ridges(cos_s: np.ndarray, a: np.ndarray, b: np.ndarray, prominence:
     return int(np.sum((peaks > margin) & (peaks < n - 1 - margin)))
 
 
+def density_integral(density: np.ndarray, a: np.ndarray, b: np.ndarray, px_to_base: float, step: float = 0.5) -> float:
+    """Integral of winding density along the segment, in windings; density is
+    windings per base voxel, segment length converted with px_to_base."""
+    n = max(5, int(np.hypot(*(b - a)) / step))
+    t = np.linspace(0.0, 1.0, n)
+    pts = a[None, :] * (1 - t)[:, None] + b[None, :] * t[:, None]
+    prof = map_coordinates(density, pts.T, order=1, mode="nearest")
+    return float(np.mean(prof) * np.hypot(*(b - a)) * px_to_base)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gold", type=Path, required=True)
@@ -51,8 +61,10 @@ def main() -> None:
     ap.add_argument("--smooth", type=float, default=0.7)
     ap.add_argument("--prominence", type=float, default=0.05)
     ap.add_argument("--crop", type=int, default=None)
+    ap.add_argument("--base-level", type=int, default=0, help="pyramid level of the 'base voxel' grad_mag density refers to")
     ap.add_argument("--out", type=Path, default=Path("out"))
     args = ap.parse_args()
+    px_to_base = 2.0 ** (1 - args.base_level)  # level-1 px -> base voxels
 
     z2 = args.z0 // 4
     if args.crop:
@@ -63,7 +75,7 @@ def main() -> None:
     win = read_slice_window_cos_level1(PHERC0826_L2, z2, y0, y1, x0, x1)
     axis = axis_at(load_control_points(UMBILICUS), win.z, level=1)
     nx, ny, _ = orient_normals(win.nx, win.ny, win.y0, win.x0, axis)
-    field = wrapped_phase(win.cos, nx, ny, window=args.window, smooth_sigma=args.smooth)
+    field = wrapped_phase(win.cos, nx, ny, window=args.window, smooth_sigma=args.smooth, grad_mag=win.grad_mag, min_grad_mag=1e-6)
     masked = np.ma.array(field.phi.astype(np.float64), mask=~field.valid)
     unwrapped = np.nan_to_num(np.ma.filled(unwrap_phase(masked, rng=0), np.nan), nan=0.0)
     comp, _ = label(field.valid)
@@ -79,10 +91,11 @@ def main() -> None:
             a, b = yx[i], yx[i + 1]
             ca, cb = comp[int(a[0]), int(a[1])], comp[int(b[0]), int(b[1])]
             ridges = interior_ridges(cos_s, a, b, args.prominence)
+            dens = density_integral(win.grad_mag, a, b, px_to_base)
             if ca == 0 or ca != cb:
-                rows.append({"unwrap": None, "ridges": ridges}); continue
+                rows.append({"unwrap": None, "ridges": ridges, "dens": dens}); continue
             va, vb = map_coordinates(unwrapped, np.array([a, b]).T, order=1, mode="nearest")
-            rows.append({"unwrap": int(np.rint((vb - va) / TWO_PI)), "ridges": ridges})
+            rows.append({"unwrap": int(np.rint((vb - va) / TWO_PI)), "ridges": ridges, "dens": dens})
 
     total = len(rows)
 
@@ -98,6 +111,10 @@ def main() -> None:
         "ridge_count_histogram": {int(k): int(v) for k, v in zip(*np.unique([r["ridges"] for r in rows], return_counts=True))},
         "certificate (unwrap == ridges+1 == 1)": pc([r for r in unw if r["unwrap"] == r["ridges"] + 1], lambda r: r["unwrap"] == 1),
         "agree_any_value": pc([r for r in unw if r["unwrap"] == r["ridges"] + 1], lambda r: True),
+        "density_integral_percentiles_10_50_90 (windings, gold = 1)": [round(float(x), 3) for x in np.percentile([r["dens"] for r in rows], [10, 50, 90])],
+        "density_alone (round == 1)": pc(rows, lambda r: int(np.rint(r["dens"])) == 1),
+        "certificate3 (unwrap == ridges+1 == round(density) == 1)": pc([r for r in unw if r["unwrap"] == r["ridges"] + 1 == int(np.rint(r["dens"]))], lambda r: r["unwrap"] == 1),
+        "unwrap_and_density (unwrap == round(density) == 1)": pc([r for r in unw if r["unwrap"] == int(np.rint(r["dens"]))], lambda r: r["unwrap"] == 1),
         "unwrap_1_but_ridges_not_0": sum(1 for r in unw if r["unwrap"] == 1 and r["ridges"] != 0),
         "ridges_0_but_unwrap_not_1": sum(1 for r in unw if r["ridges"] == 0 and r["unwrap"] != 1),
     }

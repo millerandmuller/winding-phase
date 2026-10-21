@@ -129,13 +129,31 @@ def read_slice_window_cos_level1(
         factors = (target[0] / a.shape[0], target[1] / a.shape[1])
         return zoom(a, factors, order=1)
 
+    # Normals are an unoriented axis (n and -n are the same sample), so they
+    # are interpolated as a structure tensor, never as vectors (villa lasagna
+    # docs, confirmed by the author 2026-10-21).
+    nx_up, ny_up = upsample_normals_tensor(l2.nx, l2.ny, up)
+
     return SliceWindow(
         z=2 * z,
         y0=2 * y0,
         x0=2 * x0,
         cos=decode_cos(cos_u8),
         grad_mag=up(l2.grad_mag),
-        nx=up(l2.nx),
-        ny=up(l2.ny),
+        nx=nx_up,
+        ny=ny_up,
         ct=up(l2.ct.astype(np.float32)).astype(np.uint8),
     )
+
+
+def upsample_normals_tensor(nx: np.ndarray, ny: np.ndarray, up) -> tuple[np.ndarray, np.ndarray]:
+    """Resample an unoriented in-plane normal field through its structure tensor.
+
+    The tensor components nx^2, ny^2, nx*ny are interpolated with `up`, and the
+    principal eigenvector is taken back; its in-plane length is kept so that
+    pixels whose normal points mostly along z stay short.
+    """
+    txx, tyy, txy = up(nx * nx), up(ny * ny), up(nx * ny)
+    theta = 0.5 * np.arctan2(2.0 * txy, txx - tyy)
+    length = np.sqrt(np.clip(txx + tyy, 0.0, None))
+    return (length * np.cos(theta)).astype(np.float32), (length * np.sin(theta)).astype(np.float32)

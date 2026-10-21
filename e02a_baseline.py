@@ -69,7 +69,7 @@ def main() -> None:
     t_read = time.time() - t0
     axis = axis_at(load_control_points(UMBILICUS), win.z, level=1)
     nx, ny, _ = orient_normals(win.nx, win.ny, win.y0, win.x0, axis)
-    field = wrapped_phase(win.cos, nx, ny, window=args.window, smooth_sigma=args.smooth)
+    field = wrapped_phase(win.cos, nx, ny, window=args.window, smooth_sigma=args.smooth, grad_mag=win.grad_mag, min_grad_mag=1e-6)
 
     t1 = time.time()
     masked = np.ma.array(field.phi.astype(np.float64), mask=~field.valid)

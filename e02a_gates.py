@@ -58,7 +58,7 @@ def main() -> None:
     win = read_slice_window_cos_level1(PHERC0826_L2, z2, y0, y1, x0, x1)
     axis = axis_at(load_control_points(UMBILICUS), win.z, level=1)
     nx, ny, _ = orient_normals(win.nx, win.ny, win.y0, win.x0, axis)
-    field = wrapped_phase(win.cos, nx, ny, window=args.window)
+    field = wrapped_phase(win.cos, nx, ny, window=args.window, grad_mag=win.grad_mag, min_grad_mag=1e-6)
     res = residues(field)
     masked = np.ma.array(field.phi.astype(np.float64), mask=~field.valid)
     unwrapped = np.nan_to_num(np.ma.filled(unwrap_phase(masked, rng=0), np.nan), nan=0.0)
