@@ -92,6 +92,8 @@ def main() -> None:
     ap.add_argument("--crop", type=int, default=None, help="centred square side in level-2 pixels; omit for the full slice")
     ap.add_argument("--window", type=int, default=15, help="contrast window in level-2 pixels (doubled at level 1)")
     ap.add_argument("--level1", action="store_true", help="read cos at pyramid level 1 (2x finer); normals and CT upsampled")
+    ap.add_argument("--smooth", type=float, default=0.7, help="gaussian sigma on cos before normalisation (px at the working level)")
+    ap.add_argument("--min-grad-mag", type=float, default=0.0, help="drop pixels whose Lasagna grad_mag is below this (decoded units)")
     ap.add_argument("--orient", action="store_true", help="orient normals outward from the umbilicus (data/PHerc0826_umbilicus.json)")
     ap.add_argument("--out", type=Path, default=Path("out"))
     args = ap.parse_args()
@@ -111,17 +113,18 @@ def main() -> None:
     if args.orient:
         axis = axis_at(load_control_points(UMBILICUS), win.z, level=level)
         nx, ny, _ = orient_normals(nx, ny, win.y0, win.x0, axis)
-    field = wrapped_phase(win.cos, nx, ny, window=window)
+    field = wrapped_phase(win.cos, nx, ny, window=window, grad_mag=win.grad_mag, min_grad_mag=args.min_grad_mag, smooth_sigma=args.smooth)
     res = residues(field)
     s = stats(win, field, res)
     s["read_seconds"] = round(t_read, 1)
     s["window"] = window
     s["level"] = level
     s["normals_oriented"] = bool(args.orient)
+    s["min_grad_mag"] = args.min_grad_mag
     s["source"] = {"lasagna": stores.lasagna_root, "ct": stores.ct_url}
 
     args.out.mkdir(parents=True, exist_ok=True)
-    tag = f"PHerc0826_L{level}_z{win.z}_" + ("full" if args.crop is None else f"crop{args.crop}") + ("_oriented" if args.orient else "")
+    tag = f"PHerc0826_L{level}_z{win.z}_" + ("full" if args.crop is None else f"crop{args.crop}") + ("_oriented" if args.orient else "") + (f"_gm{args.min_grad_mag:g}" if args.min_grad_mag else "") + (f"_s{args.smooth:g}" if args.smooth != 0.7 else "")
     png = args.out / f"e01_residues_{tag}.png"
     render(win, field, res, png, f"E-01 {tag}: residues of Lasagna wrapped phase")
     (args.out / f"e01_stats_{tag}.json").write_text(json.dumps(s, indent=2))

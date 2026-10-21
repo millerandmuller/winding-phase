@@ -1,0 +1,30 @@
+{
+  "m7": "https://vesuvius-challenge-open-data.s3.us-east-1.amazonaws.com/PHerc0826/representations/predictions/surfaces/20250821151701-surface-20260413222639-surface-m7-L0-th0.2.zarr/2",
+  "threshold": 128,
+  "near_px": 3,
+  "erode_px": 30,
+  "m7_surface_fraction_of_valid": 0.161,
+  "rows": [
+    {
+      "region": "papyrus (within near px of m7 surface)",
+      "cells": 1757617,
+      "residues": 6766,
+      "per_1000": 3.85,
+      "dipole_share": 0.309
+    },
+    {
+      "region": "off papyrus",
+      "cells": 963478,
+      "residues": 3516,
+      "per_1000": 3.65,
+      "dipole_share": 0.362
+    },
+    {
+      "region": "all valid",
+      "cells": 2721095,
+      "residues": 10282,
+      "per_1000": 3.78,
+      "dipole_share": 0.327
+    }
+  ]
+}

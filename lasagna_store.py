@@ -121,7 +121,14 @@ def read_slice_window_cos_level1(
     l2 = read_slice_window(stores, z, y0, y1, x0, x1)
     cos_l1_url = f"{stores.lasagna_root}/{stores.scroll}_cos.ome.zarr/1"
     cos_u8 = open_array(cos_l1_url)[2 * z, 2 * y0 : 2 * y1, 2 * x0 : 2 * x1]
-    up = lambda a: zoom(a, 2, order=1)  # noqa: E731
+    # Level 1 is ceil(level0 / 2) wide, so a doubled level-2 window can overrun
+    # it by one pixel at the slice edge; resample to the cos array's exact shape.
+    target = cos_u8.shape
+
+    def up(a: np.ndarray) -> np.ndarray:
+        factors = (target[0] / a.shape[0], target[1] / a.shape[1])
+        return zoom(a, factors, order=1)
+
     return SliceWindow(
         z=2 * z,
         y0=2 * y0,

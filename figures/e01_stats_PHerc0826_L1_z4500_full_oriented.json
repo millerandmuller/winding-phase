@@ -1,0 +1,28 @@
+{
+  "z_level2": 4500,
+  "window_y0_x0": [
+    0,
+    0
+  ],
+  "window_shape": [
+    4085,
+    4085
+  ],
+  "cos_zero_fraction": 0.7595445617830406,
+  "valid_fraction": 0.2404554382169594,
+  "valid_pixels": 4012534,
+  "residues_positive": 6651,
+  "residues_negative": 6658,
+  "residues_per_1000_valid_pixels": 3.316856629750676,
+  "normal_agreement_rad_per_px": 0.4066266715526581,
+  "contrast_median_in_valid": 0.800634503364563,
+  "cells_total": 16679056,
+  "read_seconds": 158.4,
+  "window": 30,
+  "level": 1,
+  "normals_oriented": true,
+  "source": {
+    "lasagna": "https://vesuvius-challenge-open-data.s3.us-east-1.amazonaws.com/PHerc0826/representations/predictions/lasagna/20250821151701-lasagna-20260419180421",
+    "ct": "https://vesuvius-challenge-open-data.s3.us-east-1.amazonaws.com/PHerc0826/volumes/20250821151701-9.362um-1.2m-113keV-masked.zarr/2"
+  }
+}

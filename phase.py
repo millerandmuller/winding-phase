@@ -32,7 +32,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.ndimage import gaussian_filter, maximum_filter, minimum_filter
+from scipy.ndimage import binary_erosion, gaussian_filter, maximum_filter, minimum_filter
 
 TWO_PI = 2.0 * np.pi
 
@@ -79,6 +79,8 @@ def wrapped_phase(
     min_cos: float = 1e-3,
     min_contrast: float = 0.05,
     smooth_sigma: float = 0.7,
+    grad_mag: np.ndarray | None = None,
+    min_grad_mag: float = 0.0,
 ) -> PhaseField:
     """Reconstruct the wrapped phase of one slice.
 
@@ -88,8 +90,13 @@ def wrapped_phase(
     """
     cos = cos.astype(np.float32)
     inside = cos > min_cos
+    # The contrast window and the Riesz transform both smear the zero border of
+    # unprocessed chunks into the scroll; keep only pixels a full window away.
+    inside = binary_erosion(inside, np.ones((window, window), bool))
     c_norm, contrast = normalise_contrast(gaussian_filter(cos, smooth_sigma), window)
     valid = inside & (contrast > min_contrast)
+    if grad_mag is not None:
+        valid &= grad_mag > min_grad_mag
     c_norm = np.where(valid, c_norm, 0.0).astype(np.float32)
 
     ry, rx = riesz_transform(c_norm)

@@ -1,0 +1,141 @@
+{
+  "npz": "out/e01_arrays_PHerc0826_L1_z4500_full_oriented.npz",
+  "umbilicus_level_yx": [
+    2200.0,
+    1677.5
+  ],
+  "total_residues": 10282,
+  "total_dipole_share": 0.327,
+  "by_period": [
+    {
+      "period_px_lo": 0.0,
+      "period_px_hi": 3.0,
+      "cells": 27874,
+      "residues": 285,
+      "per_1000": 10.22,
+      "dipole_share": 0.361
+    },
+    {
+      "period_px_lo": 3.0,
+      "period_px_hi": 4.0,
+      "cells": 8021,
+      "residues": 8,
+      "per_1000": 1.0,
+      "dipole_share": 0.5
+    },
+    {
+      "period_px_lo": 4.0,
+      "period_px_hi": 5.0,
+      "cells": 9566,
+      "residues": 7,
+      "per_1000": 0.73,
+      "dipole_share": 0.143
+    },
+    {
+      "period_px_lo": 5.0,
+      "period_px_hi": 6.0,
+      "cells": 69629,
+      "residues": 380,
+      "per_1000": 5.46,
+      "dipole_share": 0.445
+    },
+    {
+      "period_px_lo": 6.0,
+      "period_px_hi": 8.0,
+      "cells": 486416,
+      "residues": 2207,
+      "per_1000": 4.54,
+      "dipole_share": 0.382
+    },
+    {
+      "period_px_lo": 8.0,
+      "period_px_hi": 10.0,
+      "cells": 385421,
+      "residues": 1624,
+      "per_1000": 4.21,
+      "dipole_share": 0.368
+    },
+    {
+      "period_px_lo": 10.0,
+      "period_px_hi": 14.0,
+      "cells": 452410,
+      "residues": 2221,
+      "per_1000": 4.91,
+      "dipole_share": 0.304
+    },
+    {
+      "period_px_lo": 14.0,
+      "period_px_hi": 20.0,
+      "cells": 461302,
+      "residues": 1792,
+      "per_1000": 3.88,
+      "dipole_share": 0.29
+    },
+    {
+      "period_px_lo": 20.0,
+      "period_px_hi": 40.0,
+      "cells": 590220,
+      "residues": 1327,
+      "per_1000": 2.25,
+      "dipole_share": 0.257
+    },
+    {
+      "period_px_lo": 40.0,
+      "period_px_hi": 1000000.0,
+      "cells": 196069,
+      "residues": 312,
+      "per_1000": 1.59,
+      "dipole_share": 0.272
+    }
+  ],
+  "by_radius_mm": [
+    {
+      "radius_mm_lo": 0,
+      "radius_mm_hi": 2,
+      "cells": 12882,
+      "residues": 33,
+      "per_1000": 2.56,
+      "dipole_share": 0.394
+    },
+    {
+      "radius_mm_lo": 2,
+      "radius_mm_hi": 5,
+      "cells": 101971,
+      "residues": 234,
+      "per_1000": 2.29,
+      "dipole_share": 0.308
+    },
+    {
+      "radius_mm_lo": 5,
+      "radius_mm_hi": 10,
+      "cells": 511117,
+      "residues": 1719,
+      "per_1000": 3.36,
+      "dipole_share": 0.299
+    },
+    {
+      "radius_mm_lo": 10,
+      "radius_mm_hi": 20,
+      "cells": 1350379,
+      "residues": 5397,
+      "per_1000": 4.0,
+      "dipole_share": 0.298
+    },
+    {
+      "radius_mm_lo": 20,
+      "radius_mm_hi": 30,
+      "cells": 746108,
+      "residues": 2837,
+      "per_1000": 3.8,
+      "dipole_share": 0.397
+    },
+    {
+      "radius_mm_lo": 30,
+      "radius_mm_hi": 1000000.0,
+      "cells": 19036,
+      "residues": 62,
+      "per_1000": 3.26,
+      "dipole_share": 0.484
+    }
+  ]
+}

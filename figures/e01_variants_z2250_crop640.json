@@ -1,0 +1,31 @@
+[
+  {
+    "variant": "A_level2_stored_normals",
+    "valid_pixels": 307125,
+    "residues": 3911,
+    "residues_per_1000_valid": 12.73,
+    "dipole_fraction": 0.516,
+    "normal_agreement_rad_per_px": 0.666
+  },
+  {
+    "variant": "B_level2_oriented_normals",
+    "valid_pixels": 307125,
+    "residues": 3610,
+    "residues_per_1000_valid": 11.75,
+    "dipole_fraction": 0.507,
+    "normal_agreement_rad_per_px": 0.675,
+    "umbilicus_level2_yx": [
+      1100.0,
+      838.8
+    ],
+    "radial_dot_below_0.2_fraction": 0.119
+  },
+  {
+    "variant": "C_level1_cos_oriented_normals",
+    "valid_pixels": 1227250,
+    "residues": 3564,
+    "residues_per_1000_valid": 2.9,
+    "dipole_fraction": 0.242,
+    "normal_agreement_rad_per_px": 0.4
+  }
+]
