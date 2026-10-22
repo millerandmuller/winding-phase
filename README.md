@@ -113,6 +113,22 @@ What the plain unwrap gets wrong: missed wraps (0) and reversed direction (-1) o
 
 Not done: 3D consistency across slices, a fit, slips per wrap. Reproduce with `e02a_kwrap.py` per slice (flags in its docstring: window 30, smooth 0.3, prominence 0.08, base level 1, density scale 1.23) and `e02a_heldout8.py` to pool.
 
+## From scoring to constraints (E-03, in progress)
+
+The certificate above scores pairs that PCU chose. A constraint source has to choose its own. `e03_ladders.py` does that on one slice: seeds on cosine ridges (one per 16 px cell at level 1), a walk outward along the oriented normal to the next cosine ridge, and each hop certified as one winding by the integrated density (within 0.35 of 1.0, a band rather than rounding, because a half-spacing hop integrates to about 0.6 and would round to 1) and by the 2D unwrap. Hops chain into ladders with relative windings, written in PCU's gold format (point collections v1, level-0 coordinates), the format the villa fitter reads as `relative_windings.json`.
+
+Scored by overlap with the gold: a gold pair whose two rungs both lie within 2.5 px of points of one of our ladders is a test, correct if the winding difference of that ladder matches. Eight held-out slices, 34,377 ladders, 78,398 one-wrap pairs, 2,235 tests (1 to 3 wraps):
+
+| | Correct | Precision |
+|---|---|---|
+| winding count, sign ignored | 2,211 | 98.9% |
+| count and sign, sign from the outward normal | 2,139 | 95.7% |
+| count and sign, sign from a prior fit (PCU's tracks-only fit A0, winding gradient over 120 voxels) | 2,192 | 98.1% |
+
+Without the unwrap vote the count drops to 99.2% on one slice (spurious cosine ridges that the density band lets through), so both votes stay. The sign is the finding: where a crushed sheet doubles back, the fitter's winding decreases outward, and no local measurement can tell (the normals are an unoriented axis, the cosine is a wrapped phase). On the first slice 53 of 820 gold one-wrap pairs run inward, and every sign error of the outward rule sits on them. `e03_sign.py` therefore reads the direction of increasing winding from a prior fit grid (`grids_<run>.npz` as PCU stacks them) and reverses the ladders that run against it. A 60-voxel radius leaves 96.9%, 120 and 200 give 98.1%, 300 gives 97.5%.
+
+Next: the 63-slice band export (z 8500 to 9492 every 16, mirroring PCU's fit input), three fits on the same tracks and seed (no constraints, PCU's constraints, ours), slips per wrap on the held-out eight with PCU's own `e43_eval_gold.py`. Stats per slice in `figures/e03/`.
+
 ## Data
 
 - Lasagna product: `PHerc0826/representations/predictions/lasagna/20250821151701-lasagna-20260419180421/` on the open-data bucket (model 20260419180421). Channels cos, grad_mag, nx, ny; no sin or direction channels. Encodings in `lasagna_store.py`.

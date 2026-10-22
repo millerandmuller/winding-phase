@@ -1,0 +1,152 @@
+{
+  "z0": 9040,
+  "crop": null,
+  "cert": "three",
+  "density_band": 0.35,
+  "min_radial": 0.0,
+  "seeds": 12923,
+  "ladders": 4252,
+  "points": 14374,
+  "pairs_1wrap": 10122,
+  "hops_tried": 20076,
+  "hop_density_is_1": 0.7787,
+  "hop_unwrap_is_1": 0.706,
+  "hop_ridges_is_1": 0.9988,
+  "rung_len_px_p5_p50_p95": [
+    5.0,
+    7.0,
+    17.5
+  ],
+  "ladder_len_hist": {
+    "2": 2013,
+    "3": 887,
+    "4": 481,
+    "5": 295,
+    "6": 189,
+    "7": 125,
+    "8": 79,
+    "9": 183
+  },
+  "against_gold": {
+    "tests": 240,
+    "correct": 237,
+    "precision": 0.9875,
+    "correct_unsigned": 237,
+    "precision_unsigned": 0.9875,
+    "per_k": {
+      "1": {
+        "gold_pairs": 761,
+        "tested": 168,
+        "correct": 167,
+        "correct_unsigned": 167,
+        "coverage_of_gold": 0.2208,
+        "precision": 0.994,
+        "precision_unsigned": 0.994
+      },
+      "2": {
+        "gold_pairs": 352,
+        "tested": 58,
+        "correct": 57,
+        "correct_unsigned": 57,
+        "coverage_of_gold": 0.1648,
+        "precision": 0.9828,
+        "precision_unsigned": 0.9828
+      },
+      "3": {
+        "gold_pairs": 175,
+        "tested": 14,
+        "correct": 13,
+        "correct_unsigned": 13,
+        "coverage_of_gold": 0.08,
+        "precision": 0.9286,
+        "precision_unsigned": 0.9286
+      }
+    },
+    "failures": [
+      {
+        "k": 1,
+        "gold_a": [
+          1872.3,
+          1448.0
+        ],
+        "gold_b": [
+          1865.3,
+          1447.4
+        ],
+        "gold_rung_len": 7.0,
+        "ours": [
+          {
+            "ladder": 601,
+            "dwind": 2,
+            "a": [
+              1874.0,
+              1449.0
+            ],
+            "b": [
+              1863.0,
+              1448.0
+            ],
+            "dist_a": 1.97,
+            "dist_b": 2.39
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "gold_a": [
+          1882.4,
+          2112.6
+        ],
+        "gold_b": [
+          1871.5,
+          2113.5
+        ],
+        "gold_rung_len": 11.0,
+        "ours": [
+          {
+            "ladder": 715,
+            "dwind": 3,
+            "a": [
+              1884.0,
+              2114.2
+            ],
+            "b": [
+              1870.0,
+              2114.5
+            ],
+            "dist_a": 2.25,
+            "dist_b": 1.73
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "gold_a": [
+          1888.4,
+          2112.6
+        ],
+        "gold_b": [
+          1871.5,
+          2113.5
+        ],
+        "gold_rung_len": 17.0,
+        "ours": [
+          {
+            "ladder": 715,
+            "dwind": 4,
+            "a": [
+              1890.0,
+              2114.2
+            ],
+            "b": [
+              1870.0,
+              2114.5
+            ],
+            "dist_a": 2.25,
+            "dist_b": 1.73
+          }
+        ]
+      }
+    ]
+  }
+}

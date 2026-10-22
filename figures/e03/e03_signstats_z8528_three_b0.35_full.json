@@ -1,0 +1,204 @@
+{
+  "ladders_in": 4396,
+  "z0": 8528.0,
+  "grid": "grids_PHerc0826_A0.npz",
+  "method": "gradient",
+  "radius": 120.0,
+  "grid_points_at_z": 243984,
+  "kept": 4025,
+  "flipped": 316,
+  "unreadable": 55,
+  "dropped": 0,
+  "against_gold": {
+    "tests": 272,
+    "correct": 267,
+    "precision": 0.9816,
+    "correct_unsigned": 272,
+    "precision_unsigned": 1.0,
+    "per_k": {
+      "1": {
+        "gold_pairs": 820,
+        "tested": 181,
+        "correct": 176,
+        "correct_unsigned": 181,
+        "coverage_of_gold": 0.2207,
+        "precision": 0.9724,
+        "precision_unsigned": 1.0
+      },
+      "2": {
+        "gold_pairs": 391,
+        "tested": 67,
+        "correct": 67,
+        "correct_unsigned": 67,
+        "coverage_of_gold": 0.1714,
+        "precision": 1.0,
+        "precision_unsigned": 1.0
+      },
+      "3": {
+        "gold_pairs": 200,
+        "tested": 24,
+        "correct": 24,
+        "correct_unsigned": 24,
+        "coverage_of_gold": 0.12,
+        "precision": 1.0,
+        "precision_unsigned": 1.0
+      }
+    },
+    "failures": [
+      {
+        "k": 1,
+        "gold_a": [
+          2042.6,
+          604.2
+        ],
+        "gold_b": [
+          2029.4,
+          623.6
+        ],
+        "gold_rung_len": 23.5,
+        "ours": [
+          {
+            "ladder": 1276,
+            "dwind": -1,
+            "a": [
+              2043.4,
+              605.5
+            ],
+            "b": [
+              2027.0,
+              623.0
+            ],
+            "dist_a": 1.51,
+            "dist_b": 2.5
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "gold_a": [
+          2042.5,
+          604.0
+        ],
+        "gold_b": [
+          2029.1,
+          623.6
+        ],
+        "gold_rung_len": 23.8,
+        "ours": [
+          {
+            "ladder": 1276,
+            "dwind": -1,
+            "a": [
+              2043.4,
+              605.5
+            ],
+            "b": [
+              2027.0,
+              623.0
+            ],
+            "dist_a": 1.69,
+            "dist_b": 2.21
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "gold_a": [
+          2042.7,
+          603.6
+        ],
+        "gold_b": [
+          2028.8,
+          623.6
+        ],
+        "gold_rung_len": 24.4,
+        "ours": [
+          {
+            "ladder": 1276,
+            "dwind": -1,
+            "a": [
+              2043.4,
+              605.5
+            ],
+            "b": [
+              2027.0,
+              623.0
+            ],
+            "dist_a": 2.0,
+            "dist_b": 1.9
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "gold_a": [
+          2042.5,
+          603.3
+        ],
+        "gold_b": [
+          2028.4,
+          623.2
+        ],
+        "gold_rung_len": 24.4,
+        "ours": [
+          {
+            "ladder": 1276,
+            "dwind": -1,
+            "a": [
+              2043.4,
+              605.5
+            ],
+            "b": [
+              2027.0,
+              623.0
+            ],
+            "dist_a": 2.27,
+            "dist_b": 1.39
+          },
+          {
+            "ladder": 1278,
+            "dwind": -1,
+            "a": [
+              2043.1,
+              604.8
+            ],
+            "b": [
+              2026.3,
+              622.7
+            ],
+            "dist_a": 1.61,
+            "dist_b": 2.12
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "gold_a": [
+          2042.6,
+          603.1
+        ],
+        "gold_b": [
+          2028.2,
+          622.7
+        ],
+        "gold_rung_len": 24.4,
+        "ours": [
+          {
+            "ladder": 1278,
+            "dwind": -1,
+            "a": [
+              2043.1,
+              604.8
+            ],
+            "b": [
+              2026.3,
+              622.7
+            ],
+            "dist_a": 1.84,
+            "dist_b": 1.84
+          }
+        ]
+      }
+    ]
+  }
+}

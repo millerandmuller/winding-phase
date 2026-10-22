@@ -1,0 +1,176 @@
+{
+  "ladders_in": 4421,
+  "z0": 9296.0,
+  "grid": "grids_PHerc0826_A0.npz",
+  "method": "gradient",
+  "radius": 120.0,
+  "grid_points_at_z": 244104,
+  "kept": 4081,
+  "flipped": 331,
+  "unreadable": 9,
+  "dropped": 0,
+  "against_gold": {
+    "tests": 265,
+    "correct": 261,
+    "precision": 0.9849,
+    "correct_unsigned": 261,
+    "precision_unsigned": 0.9849,
+    "per_k": {
+      "1": {
+        "gold_pairs": 891,
+        "tested": 176,
+        "correct": 175,
+        "correct_unsigned": 175,
+        "coverage_of_gold": 0.1975,
+        "precision": 0.9943,
+        "precision_unsigned": 0.9943
+      },
+      "2": {
+        "gold_pairs": 457,
+        "tested": 67,
+        "correct": 65,
+        "correct_unsigned": 65,
+        "coverage_of_gold": 0.1466,
+        "precision": 0.9701,
+        "precision_unsigned": 0.9701
+      },
+      "3": {
+        "gold_pairs": 233,
+        "tested": 22,
+        "correct": 21,
+        "correct_unsigned": 21,
+        "coverage_of_gold": 0.0944,
+        "precision": 0.9545,
+        "precision_unsigned": 0.9545
+      }
+    },
+    "failures": [
+      {
+        "k": 2,
+        "gold_a": [
+          1864.4,
+          1104.1
+        ],
+        "gold_b": [
+          1849.4,
+          1103.9
+        ],
+        "gold_rung_len": 15.0,
+        "ours": [
+          {
+            "ladder": 431,
+            "dwind": 3,
+            "a": [
+              1866.0,
+              1104.0
+            ],
+            "b": [
+              1847.0,
+              1103.4
+            ],
+            "dist_a": 1.65,
+            "dist_b": 2.44
+          }
+        ]
+      },
+      {
+        "k": 1,
+        "gold_a": [
+          1862.4,
+          1344.4
+        ],
+        "gold_b": [
+          1855.5,
+          1344.6
+        ],
+        "gold_rung_len": 7.0,
+        "ours": [
+          {
+            "ladder": 441,
+            "dwind": 2,
+            "a": [
+              1864.0,
+              1344.0
+            ],
+            "b": [
+              1853.0,
+              1344.3
+            ],
+            "dist_a": 1.61,
+            "dist_b": 2.47
+          },
+          {
+            "ladder": 571,
+            "dwind": 2,
+            "a": [
+              1864.0,
+              1343.9
+            ],
+            "b": [
+              1853.0,
+              1344.3
+            ],
+            "dist_a": 1.65,
+            "dist_b": 2.45
+          }
+        ]
+      },
+      {
+        "k": 2,
+        "gold_a": [
+          1869.4,
+          1343.4
+        ],
+        "gold_b": [
+          1855.5,
+          1344.6
+        ],
+        "gold_rung_len": 14.0,
+        "ours": [
+          {
+            "ladder": 571,
+            "dwind": 3,
+            "a": [
+              1871.0,
+              1343.4
+            ],
+            "b": [
+              1853.0,
+              1344.3
+            ],
+            "dist_a": 1.64,
+            "dist_b": 2.45
+          }
+        ]
+      },
+      {
+        "k": 3,
+        "gold_a": [
+          1876.3,
+          1342.3
+        ],
+        "gold_b": [
+          1855.5,
+          1344.6
+        ],
+        "gold_rung_len": 20.9,
+        "ours": [
+          {
+            "ladder": 571,
+            "dwind": 4,
+            "a": [
+              1877.0,
+              1343.1
+            ],
+            "b": [
+              1853.0,
+              1344.3
+            ],
+            "dist_a": 1.07,
+            "dist_b": 2.45
+          }
+        ]
+      }
+    ]
+  }
+}
