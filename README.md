@@ -154,6 +154,10 @@ Pod time: about 3.5 hours including a first attempt that filled the 50 GB disk. 
 
 Gill and Tran's PCU tool (https://github.com/Jashann/vesuvius-scrolling): certified relative-winding constraints, 99.62% precision at 70% coverage on Paris 4; on PHerc0826 their held-out set (`gold0826_heldout8.json`) and fit grids are published and are the scoring target here.
 
+## How this was built
+
+By Lutfiya Miller, with Claude Code (Anthropic) as the coding and analysis agent. Every number in this README was produced by the committed scripts on the data named next to it; the per-run JSON and eval files under `figures/` are the record. Fits ran on a rented single-GPU pod with `e03_fit_pod.py`.
+
 ## License
 
 MIT.
