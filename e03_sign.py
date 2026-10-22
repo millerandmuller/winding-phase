@@ -39,12 +39,18 @@ def grid_curves_at_z(grid: np.lib.npyio.NpzFile, z0: float, upsample: int = 6) -
         with np.errstate(all="ignore"):
             zrow = np.nanmean(z, axis=1)
         ok = np.isfinite(zrow)
-        if ok.sum() < 2 or not (np.nanmin(zrow) <= z0 <= np.nanmax(zrow)):
+        if ok.sum() < 2:
+            continue
+        # The band's first and last slices can sit a fraction of a row outside
+        # the grid's row means; clamp within one row spacing, skip beyond.
+        zc = float(np.clip(z0, np.nanmin(zrow), np.nanmax(zrow)))
+        if abs(zc - z0) > 20:
             continue
         rows = np.flatnonzero(ok)
-        i1 = rows[np.searchsorted(zrow[rows], z0)]
-        i0 = rows[max(0, np.searchsorted(zrow[rows], z0) - 1)]
-        t = 0.0 if i0 == i1 else (z0 - zrow[i0]) / (zrow[i1] - zrow[i0])
+        k = min(np.searchsorted(zrow[rows], zc), len(rows) - 1)
+        i1 = rows[k]
+        i0 = rows[max(0, k - 1)]
+        t = 0.0 if i0 == i1 else (zc - zrow[i0]) / (zrow[i1] - zrow[i0])
         x = (1 - t) * g[0, i0] + t * g[0, i1]
         y = (1 - t) * g[1, i0] + t * g[1, i1]
         valid = (g[0, i0] > 0) & (g[0, i1] > 0)

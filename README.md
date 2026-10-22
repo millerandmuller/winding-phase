@@ -127,7 +127,9 @@ Scored by overlap with the gold: a gold pair whose two rungs both lie within 2.5
 
 Without the unwrap vote the count drops to 99.2% on one slice (spurious cosine ridges that the density band lets through), so both votes stay. The sign is the finding: where a crushed sheet doubles back, the fitter's winding decreases outward, and no local measurement can tell (the normals are an unoriented axis, the cosine is a wrapped phase). On the first slice 53 of 820 gold one-wrap pairs run inward, and every sign error of the outward rule sits on them. `e03_sign.py` therefore reads the direction of increasing winding from a prior fit grid (`grids_<run>.npz` as PCU stacks them) and reverses the ladders that run against it. A 60-voxel radius leaves 96.9%, 120 and 200 give 98.1%, 300 gives 97.5%.
 
-Next: the 63-slice band export (z 8500 to 9492 every 16, mirroring PCU's fit input), three fits on the same tracks and seed (no constraints, PCU's constraints, ours), slips per wrap on the held-out eight with PCU's own `e43_eval_gold.py`. Stats per slice in `figures/e03/`.
+The band file for the fitter is built: z 8500 to 9492 every 16 (63 slices, PCU's spacing), 268,401 ladders, 881,629 points, 3.28 points per ladder (PCU's input: 25,771 ladders, 73,110 points on the same slices). Signs: 239,686 ladders along the A0 gradient, 19,867 reversed by it, 8,848 with no readable gradient kept outward (two thirds of those on the band's first slice, where the A0 grid has no row). `relative_windings.json`, 122 MB, SHA256 `3f9c41a6...`, built by `e03_ladders.py` on each slice (about 2.7 minutes per slice on an M4), `e03_sign.py` with `grids_PHerc0826_A0.npz`, `e03_merge_band.py`; summary in `figures/e03/band_relative_windings.summary.json`. The file is not in the repository.
+
+Next: `e03_fit_pod.py` on a 16 GB GPU, three fits on the same tracks, seed and steps (no constraints, PCU's constraints, ours), slips per wrap on the held-out eight with PCU's own `e43_eval_gold.py`. Stats per slice in `figures/e03/`.
 
 ## Data
 
