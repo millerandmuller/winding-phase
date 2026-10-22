@@ -135,9 +135,11 @@ The band file for the fitter is built: z 8500 to 9492 every 16 (63 slices, PCU's
 |---|---|---|---|---|
 | none (tracks only) | **49.5%** (2,042 of 4,125) | 4,125 | 1,754 | |
 | PCU's `pcu_gold_0826_fit_v2.json`, 25,771 ladders | **36.1%** (1,702 of 4,714) | 4,714 | 1,210 | 46.8% |
-| ours, 268,401 ladders from the Lasagna product | **36.0%** (1,733 of 4,821) | 4,821 | 1,095 | 26.9% |
+| ours, 268,401 ladders from the Lasagna product | **35.9%** (1,733 of 4,821) | 4,821 | 1,095 | 26.9% |
 
-PCU published 50.1% and 36.3% for the first two rows on a T4; the reproduction here is within half a point of both, so the third row is comparable to their numbers. Ours matches PCU's constraint set on PCU's own scroll, with 2% more assigned pairs and 10% fewer unassigned points; the difference in slips (36.0 against 36.1) is noise. What differs is the source: PCU's ladders are certified against a global winding field and a density model; ours come from the cosine, the normals and grad_mag of one Lasagna run, with the sign read off a tracks-only fit, and nothing else.
+![slips per wrap](figures/e03/fits/slips_per_wrap.png)
+
+PCU published 50.1% and 36.3% for the first two rows on a T4; the reproduction here is within half a point of both, so the third row is comparable to their numbers. Ours matches PCU's constraint set on PCU's own scroll, with 2% more assigned pairs and 10% fewer unassigned points; the difference in slips (35.9 against 36.1) is noise. What differs is the source: PCU's ladders are certified against a global winding field and a density model; ours come from the cosine, the normals and grad_mag of one Lasagna run, with the sign read off a tracks-only fit, and nothing else.
 
 What the fit did not do: it satisfied 27% of our ladders against 47% of PCU's. With ten times the ladders at the same 840 draws per step, each of ours was sampled a tenth as often, so the constraint set is under-used, not wrong (98.1% signed precision on the gold). The next experiments are the draw rate and the strip weights, not the constraints.
 
