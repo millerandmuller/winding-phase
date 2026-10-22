@@ -90,7 +90,9 @@ def install(work: Path) -> tuple[Path, Path]:
     if not pcu.exists():
         sh(f"git clone https://github.com/Jashann/vesuvius-scrolling.git {pcu} && git -C {pcu} checkout -q {PCU_SHA}")
     sh(f"cd {villa}/spiral-fitting && uv sync -q")
-    sh("pip install -q awscli requests tifffile scipy numpy")
+    # Ubuntu 24.04 images mark the system Python as externally managed (PEP 668);
+    # the pod is a disposable container, so installing into it is fine.
+    sh("pip install -q --break-system-packages awscli requests tifffile scipy numpy")
     return villa, pcu
 
 
