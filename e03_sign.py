@@ -105,7 +105,8 @@ def main() -> None:
 
     out_cols, counts = {}, {"kept": 0, "flipped": 0, "unreadable": 0, "dropped": 0}
     signed_l1 = []
-    for key, c in cols.items():
+    for i, (key, c) in enumerate(cols.items()):
+        key = str(int(z0) * 100000 + i + 1)  # the fitter parses collection keys as integers
         points = [p for _, p in sorted(c["points"].items(), key=lambda kv: int(kv[0]))]
         yx0 = np.array([[p["p"][1], p["p"][0]] for p in points])
         s = (ladder_sign_gradient(yx0, tree, pts, winds, args.radius) if args.method == "gradient"
