@@ -113,7 +113,7 @@ What the plain unwrap gets wrong: missed wraps (0) and reversed direction (-1) o
 
 Not done: 3D consistency across slices, a fit, slips per wrap. Reproduce with `e02a_kwrap.py` per slice (flags in its docstring: window 30, smooth 0.3, prominence 0.08, base level 1, density scale 1.23) and `e02a_heldout8.py` to pool.
 
-## From scoring to constraints (E-03, in progress)
+## From constraints to a fit (E-03)
 
 The certificate above scores pairs that PCU chose. A constraint source has to choose its own. `e03_ladders.py` does that on one slice: seeds on cosine ridges (one per 16 px cell at level 1), a walk outward along the oriented normal to the next cosine ridge, and each hop certified as one winding by the integrated density (within 0.35 of 1.0, a band rather than rounding, because a half-spacing hop integrates to about 0.6 and would round to 1) and by the 2D unwrap. Hops chain into ladders with relative windings, written in PCU's gold format (point collections v1, level-0 coordinates), the format the villa fitter reads as `relative_windings.json`.
 
@@ -129,7 +129,20 @@ Without the unwrap vote the count drops to 99.2% on one slice (spurious cosine r
 
 The band file for the fitter is built: z 8500 to 9492 every 16 (63 slices, PCU's spacing), 268,401 ladders, 881,629 points, 3.28 points per ladder (PCU's input: 25,771 ladders, 73,110 points on the same slices). Signs: 239,686 ladders along the A0 gradient, 19,867 reversed by it, 8,848 with no readable gradient kept outward (two thirds of those on the band's first slice, where the A0 grid has no row). `relative_windings.json`, 122 MB, SHA256 `3f9c41a6...`, built by `e03_ladders.py` on each slice (about 2.7 minutes per slice on an M4), `e03_sign.py` with `grids_PHerc0826_A0.npz`, `e03_merge_band.py`; summary in `figures/e03/band_relative_windings.summary.json`. The file is not in the repository.
 
-Next: `e03_fit_pod.py` on a 16 GB GPU, three fits on the same tracks, seed and steps (no constraints, PCU's constraints, ours), slips per wrap on the held-out eight with PCU's own `e43_eval_gold.py`. Stats per slice in `figures/e03/`.
+**The fit.** `e03_fit_pod.py` on one RTX 4090 (RunPod, 2026-10-22): villa `spiral-fitting` at PCU's commit 6bbe6e2, PHerc0826 z 8500 to 9500, tracks `surface_m7_L0_th0.2`, Lasagna level-2 normals and grad_mag, 12,000 steps, seed 1, PCU's B1w20 strip-loss weights (radius 20, dt 10, 840 draws per step), three runs that differ only in `relative_windings.json`. Scored with PCU's own `exp/e43_eval_gold.py` on the eight held-out slices (3,000 ladders, 5,788 pairs sampled with seed 0):
+
+| Constraints | Slips per wrap | Assigned pairs | Unassigned points | Ladders satisfied by the fit |
+|---|---|---|---|---|
+| none (tracks only) | **49.5%** (2,042 of 4,125) | 4,125 | 1,754 | |
+| PCU's `pcu_gold_0826_fit_v2.json`, 25,771 ladders | **36.1%** (1,702 of 4,714) | 4,714 | 1,210 | 46.8% |
+| ours, 268,401 ladders from the Lasagna product | **36.0%** (1,733 of 4,821) | 4,821 | 1,095 | 26.9% |
+
+PCU published 50.1% and 36.3% for the first two rows on a T4; the reproduction here is within half a point of both, so the third row is comparable to their numbers. Ours matches PCU's constraint set on PCU's own scroll, with 2% more assigned pairs and 10% fewer unassigned points; the difference in slips (36.0 against 36.1) is noise. What differs is the source: PCU's ladders are certified against a global winding field and a density model; ours come from the cosine, the normals and grad_mag of one Lasagna run, with the sign read off a tracks-only fit, and nothing else.
+
+What the fit did not do: it satisfied 27% of our ladders against 47% of PCU's. With ten times the ladders at the same 840 draws per step, each of ours was sampled a tenth as often, so the constraint set is under-used, not wrong (98.1% signed precision on the gold). The next experiments are the draw rate and the strip weights, not the constraints.
+
+Pod time: about 3.5 hours including a first attempt that filled the 50 GB disk. Files: `figures/e03/fits/` (eval lines, satisfaction metrics); the three fitted grids (19 MB each) are kept outside the repository: SHA256 A0 `faa40111...`, PCU `0b2a8aa3...`, ours `b3738dea...`.
+
 
 ## Data
 

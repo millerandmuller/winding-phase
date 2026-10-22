@@ -1,0 +1,2 @@
+ladders 3000 pairs 5788
+A0: slips 2042/4125 = 0.4950 per wrap; unassigned points 1754
