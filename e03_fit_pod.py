@@ -92,7 +92,7 @@ def install(work: Path) -> tuple[Path, Path]:
     sh(f"cd {villa}/spiral-fitting && uv sync -q")
     # Ubuntu 24.04 images mark the system Python as externally managed (PEP 668);
     # the pod is a disposable container, so installing into it is fine.
-    sh("pip install -q --break-system-packages awscli requests tifffile scipy numpy")
+    sh("pip install -q --break-system-packages awscli requests tifffile scipy numpy 'zarr<3'")  # PCU's eval imports zarr 2's FSStore
     return villa, pcu
 
 
@@ -103,16 +103,22 @@ def assemble_dataset(work: Path, villa: Path) -> Path:
     ds = work / "ds"
     las = ds / "lasagna_inputs"
     las.mkdir(parents=True, exist_ok=True)
-    for ch in ("nx", "ny", "grad_mag"):
-        dst = las / f"PHerc0826_{ch}.ome.zarr"
-        sh(f"aws s3 sync --no-sign-request --only-show-errors s3://vesuvius-challenge-open-data/{LAS}/PHerc0826_{ch}.ome.zarr/2 {dst}/2")
-        for f in (".zattrs", ".zgroup"):
-            r = requests.get(f"{S3}/{LAS}/PHerc0826_{ch}.ome.zarr/{f}", timeout=120)
-            if r.ok:
-                (dst / f).write_bytes(r.content)
-    py = villa / "spiral-fitting/.venv/bin/python"
-    if not glob.glob(str(las / "*.respool_g2*")):
+    packed = bool(glob.glob(str(las / "*.respool_g2*")))
+    if not packed:
+        for ch in ("nx", "ny", "grad_mag"):
+            dst = las / f"PHerc0826_{ch}.ome.zarr"
+            sh(f"aws s3 sync --no-sign-request --only-show-errors s3://vesuvius-challenge-open-data/{LAS}/PHerc0826_{ch}.ome.zarr/2 {dst}/2")
+            for f in (".zattrs", ".zgroup"):
+                r = requests.get(f"{S3}/{LAS}/PHerc0826_{ch}.ome.zarr/{f}", timeout=120)
+                if r.ok:
+                    (dst / f).write_bytes(r.content)
+        py = villa / "spiral-fitting/.venv/bin/python"
         sh(f"cd {villa}/spiral-fitting && {py} pack_resident_pools.py {las} --what normals,grad_mag --normal-group 2 --io-threads 16")
+        # The fitter reads the normals and grad_mag only through the packed
+        # sidecars; the raw chunks (about 8 GB) would otherwise fill a 50 GB pod.
+        for ch in ("nx", "ny", "grad_mag"):
+            shutil.rmtree(las / f"PHerc0826_{ch}.ome.zarr" / "2", ignore_errors=True)
+        shutil.rmtree(Path.home() / ".cache/uv", ignore_errors=True)
     tracks = ds / "tracks"
     index = requests.get(TRACKS + ".vctracks/", timeout=120).text
     vfiles = [n for n in re.findall(r'href="([^"/]+)"', index) if not n.startswith("..")]
@@ -184,6 +190,8 @@ def stack_grids(work: Path, name: str) -> Path:
     np.savez_compressed(path, **grids)
     for mf in glob.glob(f"{work}/out_{name}/**/*satisf*.json", recursive=True)[:2]:
         shutil.copy(mf, path.parent / f"{name}_{os.path.basename(mf)}")
+    for ck in glob.glob(f"{work}/out_{name}/**/checkpoint_*.ckpt", recursive=True):
+        os.remove(ck)  # about 1 GB each; the grids are the product
     print(name, "windings exported", len(grids), flush=True)
     return path
 
@@ -233,7 +241,8 @@ def main() -> None:
         stack_grids(work, name)
     gold = pcu / "data/gold/gold0826_heldout8.json"
     for name in runs:
-        sh(f"cd {pcu} && LADDERS={gold} Z0={Z0} Z1={Z1} python exp/e43_eval_gold.py {name} 2>&1 | tee {work}/eval_{name}.txt",
+        # the eval globs runs/kaggle/<run>/grids_*.npz relative to the working directory
+        sh(f"cd {work} && LADDERS={gold} Z0={Z0} Z1={Z1} python {pcu}/exp/e43_eval_gold.py {name} 2>&1 | tee {work}/eval_{name}.txt",
            check=False)
     print("total", f"{time.time() - T0:.0f}s", flush=True)
 
