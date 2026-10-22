@@ -2,6 +2,11 @@
 
     python e03_fit_pod.py --ours relative_windings.json --work /workspace/e03 [--runs A0,PCU,OURS] [--gpus 0]
 
+Named runs (see RUNS): A0, PCU, OURS are the three-way comparison at PCU's
+B1w20 settings; the *_s2 runs repeat with optimizer seed 2; OURS_d8400 draws
+ten times more ladders per step (our file has ten times PCU's ladders);
+OURS_w40 doubles the strip radius weight; OURS_d8400_w40 does both.
+
 Mirrors PCU's Kaggle runner (kaggle/pcu-0826b/pcu_0826b.py in
 github.com/Jashann/vesuvius-scrolling) so the comparison differs only in the
 constraint file:
@@ -155,6 +160,20 @@ def variant(work: Path, ds: Path, name: str, relative: dict) -> Path:
     return root
 
 
+# name -> (constraint source, config overrides on top of fit_config)
+RUNS = {
+    "A0": (None, {}),
+    "PCU": ("pcu", {}),
+    "OURS": ("ours", {}),
+    "PCU_s2": ("pcu", {"optimizer_random_seed": 2}),
+    "OURS_s2": ("ours", {"optimizer_random_seed": 2}),
+    "A0_s2": (None, {"optimizer_random_seed": 2}),
+    "OURS_d8400": ("ours", {"sample_count_unattached_pcls_per_step": 8400}),
+    "OURS_w40": ("ours", {"loss_weight_unattached_pcl_radius": 40.0}),
+    "OURS_d8400_w40": ("ours", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
+}
+
+
 def fit_config(use_relative: bool) -> dict:
     cfg = {"z_begin": Z0, "z_end": Z1, "optimizer_num_training_steps": STEPS,
            "input_use_tracks": True, "input_use_fibers": False, "input_use_fiber_directions": False,
@@ -216,10 +235,11 @@ def main() -> None:
     pcu_rel["collections"] = in_band(pcu_rel["collections"])
     print("constraint ladders in band: ours", len(ours["collections"]), "PCU", len(pcu_rel["collections"]), flush=True)
 
-    runs = {"A0": (variant(work, ds, "A0", EMPTY), fit_config(False)),
-            "PCU": (variant(work, ds, "PCU", pcu_rel), fit_config(True)),
-            "OURS": (variant(work, ds, "OURS", ours), fit_config(True))}
-    runs = {k: v for k, v in runs.items() if k in args.runs.split(",")}
+    sources = {None: EMPTY, "pcu": pcu_rel, "ours": ours}
+    runs = {}
+    for name in args.runs.split(","):
+        source, extra = RUNS[name]
+        runs[name] = (variant(work, ds, name, sources[source]), dict(fit_config(source is not None), **extra))
     gpus = args.gpus.split(",")
     if not args.skip_fit:
         # one fit at a time per GPU; the rest queue behind it
