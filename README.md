@@ -118,7 +118,7 @@ What the plain unwrap gets wrong: missed wraps (0) and reversed direction (-1) o
 
 *One-wrap gold pairs over the wrapped phase, 800-pixel crop of z 8528: green +1 (right), orange 0 (missed wrap), blue -1 (reversed), red other, grey not covered by the unwrap.*
 
-Not done: 3D consistency across slices, a fit, slips per wrap. Reproduce with `e02a_kwrap.py` per slice (flags in its docstring: window 30, smooth 0.3, prominence 0.08, base level 1, density scale 1.23) and `e02a_heldout8.py` to pool.
+This section stops at the certificate; the fit follows below. Reproduce with `e02a_kwrap.py` per slice (flags in its docstring: window 30, smooth 0.3, prominence 0.08, base level 1, density scale 1.23) and `e02a_heldout8.py` to pool.
 
 ## From constraints to a fit (E-03)
 
