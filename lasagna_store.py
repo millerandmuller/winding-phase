@@ -31,6 +31,9 @@ class ScrollStores:
     lasagna_model: str
     ct_volume_name: str
     level: int
+    # Channel files are "<prefix>_<channel>.ome.zarr"; the prefix is the scroll
+    # name for the eligible scrolls and a run-specific name for Paris 4.
+    channel_prefix: str = ""
 
     @property
     def lasagna_root(self) -> str:
@@ -39,8 +42,9 @@ class ScrollStores:
             f"{self.volume_id}-lasagna-{self.lasagna_model}"
         )
 
-    def channel_url(self, channel: str) -> str:
-        return f"{self.lasagna_root}/{self.scroll}_{channel}.ome.zarr/{self.level}"
+    def channel_url(self, channel: str, level: int | None = None) -> str:
+        prefix = self.channel_prefix or self.scroll
+        return f"{self.lasagna_root}/{prefix}_{channel}.ome.zarr/{self.level if level is None else level}"
 
     @property
     def ct_url(self) -> str:
@@ -66,6 +70,19 @@ SCROLLS = {
         lasagna_model="20260419180421",
         ct_volume_name="20250821151803-9.362um-1.2m-113keV-masked.zarr",
         level=2,
+    ),
+    # Not Grand Prize eligible; used only because it has human winding labels.
+    # The spiral dataset and its human ladders are in 9.6 um coordinates
+    # (volume level 2 of the 2.4 um scan); Lasagna cos starts at level 3 and
+    # the other channels at level 4. With level=4 every ratio matches the
+    # eligible scrolls (dataset frame = "level 0", cos 2x, the rest 4x).
+    "PHercParis4": ScrollStores(
+        scroll="PHercParis4",
+        volume_id="20260411134726",
+        lasagna_model="20260419180421-L2",
+        ct_volume_name="20260411134726-2.400um-0.2m-78keV-masked.zarr",
+        level=4,
+        channel_prefix="PHercParis4-20260411134726-las-sd2-5b17ff6c",
     ),
 }
 
@@ -130,14 +147,15 @@ def read_slice_window(
 def read_slice_window_cos_level1(
     stores: ScrollStores, z: int, y0: int, y1: int, x0: int, x1: int
 ) -> SliceWindow:
-    """Like read_slice_window, but cos at pyramid level 1 (2x finer) with the
-    level-2 normals, grad_mag and CT upsampled 2x (linear) to match.
+    """Like read_slice_window, but cos one pyramid level finer (2x) with the
+    normals, grad_mag and CT upsampled 2x (linear) to match.
 
-    z, y0, y1, x0, x1 are level-2 coordinates; the returned window is at
-    level-1 resolution with origin (2*y0, 2*x0) and z index 2*z.
+    Named for the eligible scrolls (stores at level 2, cos at level 1).
+    z, y0, y1, x0, x1 are coordinates at the stores' level; the returned
+    window is one level finer with origin (2*y0, 2*x0) and z index 2*z.
     """
     l2 = read_slice_window(stores, z, y0, y1, x0, x1)
-    cos_l1_url = f"{stores.lasagna_root}/{stores.scroll}_cos.ome.zarr/1"
+    cos_l1_url = stores.channel_url("cos", stores.level - 1)
     cos_u8 = open_array(cos_l1_url)[2 * z, 2 * y0 : 2 * y1, 2 * x0 : 2 * x1]
     # Level 1 is ceil(level0 / 2) wide, so a doubled level-2 window can overrun
     # it by one pixel at the slice edge; resample to the cos array's exact shape.

@@ -22,6 +22,12 @@ run (one (3, rows, cols) array of x, y, z per winding) and the eval line
 "<run>: slips S/T = f per wrap" from PCU's exp/e43_eval_gold.py on the eight
 held-out slices (gold0826_heldout8.json).
 
+--scroll PHercParis4 (human-label check): the organizers' published spiral
+dataset as PCU used it, PCU's Paris 4 config (weights 10 / 10, outer shell at
+the fitter default), band z 8400 to 9400; A0 is PCU's A2, PCU is their B3w10
+(pass --pcu-file pcu_gold_Paris4_z8400_9400_fit_input.json), and every run is
+scored on the human ladders in the band with PCU's e31b_bootstrap.py.
+
 Needs: an NVIDIA GPU (tested on 24 and 32 GB; PCU used a 16 GB Kaggle T4 for their smaller file), about 25 GB of disk
 for the Lasagna level-2 stores and tracks, network access to the open-data
 bucket, dl.ash2txt.org and GitHub. Python 3.14 is installed by uv.
@@ -58,7 +64,16 @@ SCROLLS = {
                   "tracks": "PHerc0211_20250821151803_surface_m7_L0_th0.2.dbm",
                   "umbilicus": "20250821151803-umbilicus-20260808112626.json", "z0": 9500, "z1": 10500,
                   "pcu_file": None, "gold_file": None},  # pass --pcu-file and --gold (from e03_split_gold.py)
+    # Human-label check only (not eligible). The organizers' spiral dataset is
+    # used as published, exactly as PCU's modal/fit_p4.py does; scoring is on
+    # the human ladders in the band (PCU's exp/e31b_bootstrap.py "human").
+    "PHercParis4": {"dataset": "spiral", "z0": 8400, "z1": 9400, "pcu_file": None, "gold_file": None},
 }
+P4_DL = "https://dl.ash2txt.org/datasets/spiral_datasets/PHercParis4"
+P4_TRACKS = "2um_ds2_ps256_surf_v2.dbm"
+# Files the per-run dataset writes itself (never symlinked: the Paris 4
+# dataset ships human versions of the first three).
+PER_RUN_FILES = ("relative_windings.json", "abs_winding.json", "same_windings.json", "spiral-scroll.json")
 T0 = time.time()
 
 
@@ -107,7 +122,7 @@ def install(work: Path) -> tuple[Path, Path]:
     sh(f"cd {villa}/spiral-fitting && uv sync -q")
     # Ubuntu 24.04 images mark the system Python as externally managed (PEP 668);
     # the pod is a disposable container, so installing into it is fine.
-    sh("pip install -q --break-system-packages awscli requests tifffile scipy numpy 'zarr<3'")  # PCU's eval imports zarr 2's FSStore
+    sh("pip install -q --break-system-packages awscli requests tifffile scipy numpy 'zarr<3' fsspec aiohttp")  # PCU's eval imports zarr 2's FSStore
     return villa, pcu
 
 
@@ -149,6 +164,27 @@ def assemble_dataset(work: Path, villa: Path, scroll: str, sc: dict) -> Path:
     return ds
 
 
+def assemble_spiral_dataset(work: Path) -> Path:
+    """The published Paris 4 spiral dataset, the same file list as PCU's modal/fit_p4.py prep()."""
+    ds = work / "ds"
+    jobs = [(f"{P4_DL}/{f}", ds / f) for f in ("umbilicus.json", "abs_winding.json", "relative_windings.json", "same_windings.json")]
+    jobs += [(f"{P4_DL}/outer_shell/{f}", ds / "outer_shell" / f) for f in ("meta.json", "x.tif", "y.tif", "z.tif")]
+    for store, files in (("las_008_grad_mag.ome.zarr.respool_g4", ("meta.json", "table.npy", "brick_coords.npy", "channel_0.u8")),
+                         ("las_008_nx.ome.zarr.respool_g4_pair", ("meta.json", "table.npy", "brick_coords.npy", "channel_0.u8", "channel_1.u8"))):
+        jobs += [(f"{P4_DL}/lasagna_inputs/{store}/{f}", ds / "lasagna_inputs" / store / f) for f in files]
+    jobs += [(f"{P4_DL}/lasagna_inputs/{f}", ds / "lasagna_inputs" / f) for f in ("verification.json", "mask_report.json", "batch_verification.json")]
+    tb = f"{P4_DL}/tracks/{P4_TRACKS}"
+    jobs += [(f"{tb}.db", ds / "tracks" / f"{P4_TRACKS}.db"), (f"{tb}.crossings.npz", ds / "tracks" / f"{P4_TRACKS}.crossings.npz")]
+    jobs += [(f"{tb}.vctracks/{f}", ds / "tracks" / f"{P4_TRACKS}.vctracks" / f) for f in
+             ("arclengths.f64", "coordinates.i32", "family_codes.i8", "header.bin", "metadata.json", "offsets.i64",
+              "source_ids.u64", "tortuosities.f64", "z_bounds.i32")]
+    with ThreadPoolExecutor(6) as ex:
+        results = list(ex.map(lambda a: fetch(*a), jobs))
+    print("spiral dataset files fetched", sum(results), "of", len(jobs), flush=True)  # verification jsons may 404
+    (ds / "verified_patches").mkdir(exist_ok=True)
+    return ds
+
+
 def in_band(collections: dict, z0: int, z1: int) -> dict:
     return {k: c for k, c in collections.items() if all(z0 <= p["p"][2] < z1 for p in c["points"].values())}
 
@@ -158,11 +194,16 @@ def variant(work: Path, ds: Path, name: str, relative: dict, scroll: str) -> Pat
     root = work / f"ds_{name}"
     root.mkdir(exist_ok=True)
     for entry in os.listdir(ds):
-        if not (root / entry).exists():
+        if entry not in PER_RUN_FILES and not (root / entry).exists():
             os.symlink(ds / entry, root / entry)
     for f in ("abs_winding.json", "same_windings.json"):
         (root / f).write_text(json.dumps(EMPTY))
     (root / "relative_windings.json").write_text(json.dumps(relative))
+    if SCROLLS[scroll].get("dataset") == "spiral":
+        # PCU's Paris 4 scroll file: conventional paths, 9.6 um voxels.
+        (root / "spiral-scroll.json").write_text(json.dumps({
+            "schema_version": 1, "name": f"P4{name}", "voxel_size_um": 9.6, "spiral_outward_sense": "CW"}))
+        return root
     (root / "spiral-scroll.json").write_text(json.dumps({
         "schema_version": 1, "name": f"{scroll}_{name}", "voxel_size_um": 9.362, "spiral_outward_sense": "CW",
         "normal_zarr_group": "2", "lasagna_scale": 4,
@@ -188,6 +229,19 @@ RUNS = {
     "PCU_w40": ("pcu", {"loss_weight_unattached_pcl_radius": 40.0}),
     "PCU_d8400_w40": ("pcu", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
 }
+
+
+def fit_config_p4(use_relative: bool, z0: int, z1: int) -> dict:
+    """PCU's Paris 4 config (modal/fit_p4.py, run B3w10): outer shell left at the fitter default (on)."""
+    cfg = {"z_begin": z0, "z_end": z1, "optimizer_num_training_steps": STEPS,
+           "input_use_fibers": False, "input_use_pcl_drawn_control_points": False, "input_use_fiber_directions": False,
+           "input_use_tracks": True, "input_use_verified_patches": False,
+           "input_use_pcl_relative": use_relative, "input_use_pcl_absolute": False, "input_use_pcl_same_winding": False,
+           "input_use_winding_inference": False}
+    if use_relative:
+        cfg.update({"sample_count_unattached_pcls_per_step": 840,
+                    "loss_weight_unattached_pcl_radius": 10.0, "loss_weight_unattached_pcl_dt": 10.0})
+    return cfg
 
 
 def fit_config(use_relative: bool, z0: int, z1: int) -> dict:
@@ -247,7 +301,9 @@ def main() -> None:
     sc = SCROLLS[args.scroll]
     z0, z1 = sc["z0"], sc["z1"]
     villa, pcu = install(work)
-    ds = assemble_dataset(work, villa, args.scroll, sc)
+    spiral = sc.get("dataset") == "spiral"
+    ds = assemble_spiral_dataset(work) if spiral else assemble_dataset(work, villa, args.scroll, sc)
+    base_config = fit_config_p4 if spiral else fit_config
 
     wanted = {RUNS[n][0] for n in args.runs.split(",")}
     sources = {None: EMPTY}
@@ -267,7 +323,7 @@ def main() -> None:
     runs = {}
     for name in args.runs.split(","):
         source, extra = RUNS[name]
-        runs[name] = (variant(work, ds, name, sources[source], args.scroll), dict(fit_config(source is not None, z0, z1), **extra))
+        runs[name] = (variant(work, ds, name, sources[source], args.scroll), dict(base_config(source is not None, z0, z1), **extra))
     gpus = args.gpus.split(",")
     if not args.skip_fit:
         # one fit at a time per GPU; the rest queue behind it
@@ -287,6 +343,14 @@ def main() -> None:
             time.sleep(30)
     for name in runs:
         stack_grids(work, name)
+    if spiral:
+        # human ladders in the band, fetched by PCU's script from the dataset; reference A0 when present
+        fits = " ".join(f"{n}={work}/runs/kaggle/{n}/grids_{n}.npz" for n in runs)
+        ref = "--ref A0" if "A0" in runs else ""
+        sh(f"cd {pcu} && Z0={z0} Z1={z1} python exp/e31b_bootstrap.py human {fits} {ref} --out {work}/eval_human.json "
+           f"2>&1 | tee {work}/eval_human.txt", check=False)
+        print("total", f"{time.time() - T0:.0f}s", flush=True)
+        return
     gold = args.gold or (pcu / sc["gold_file"] if sc["gold_file"] else None)
     if gold is None:
         raise SystemExit(f"--gold is required for {args.scroll}")
