@@ -56,6 +56,24 @@ PHERC0826_L2 = ScrollStores(
     level=2,
 )
 
+# Every eligible scroll carries a Lasagna run from the same model with the same
+# pyramid levels (inventory 2026-10-23); add a scroll here and in data/.
+SCROLLS = {
+    "PHerc0826": PHERC0826_L2,
+    "PHerc0211": ScrollStores(
+        scroll="PHerc0211",
+        volume_id="20250821151803",
+        lasagna_model="20260419180421",
+        ct_volume_name="20250821151803-9.362um-1.2m-113keV-masked.zarr",
+        level=2,
+    ),
+}
+
+
+def level_shape(stores: "ScrollStores") -> tuple[int, int, int]:
+    """(z, y, x) shape of the scroll's cos store at the stores' level."""
+    return tuple(int(v) for v in open_array(stores.channel_url("cos")).shape)
+
 
 @dataclass
 class SliceWindow:

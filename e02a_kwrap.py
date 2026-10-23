@@ -22,17 +22,18 @@ from skimage.restoration import unwrap_phase
 
 from e02a_baseline import load_ladders
 from e02a_certify import density_integral, interior_ridges
-from lasagna_store import PHERC0826_L2, read_slice_window_cos_level1
+from lasagna_store import SCROLLS, level_shape, read_slice_window_cos_level1
 from phase import wrapped_phase
 from umbilicus import axis_at, load_control_points, orient_normals
 
-UMBILICUS = Path(__file__).parent / "data" / "PHerc0826_umbilicus.json"
+DATA = Path(__file__).parent / "data"
 TWO_PI = 2.0 * np.pi
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gold", type=Path, required=True)
+    ap.add_argument("--scroll", default="PHerc0826", choices=sorted(SCROLLS))
     ap.add_argument("--z0", type=int, default=8528)
     ap.add_argument("--xy-level", type=int, default=0)
     ap.add_argument("--window", type=int, default=30)
@@ -46,14 +47,16 @@ def main() -> None:
     args = ap.parse_args()
     px_to_base = 2.0 ** (1 - args.base_level)
 
+    stores = SCROLLS[args.scroll]
+    _, ny_, nx_ = level_shape(stores)
     z2 = args.z0 // 4
     if args.crop:
-        c = 2043 // 2; h = args.crop // 2
-        y0, y1, x0, x1 = c - h, c + h, c - h, c + h
+        h = args.crop // 2
+        y0, y1, x0, x1 = ny_ // 2 - h, ny_ // 2 + h, nx_ // 2 - h, nx_ // 2 + h
     else:
-        y0, y1, x0, x1 = 0, 2043, 0, 2043
-    win = read_slice_window_cos_level1(PHERC0826_L2, z2, y0, y1, x0, x1)
-    axis = axis_at(load_control_points(UMBILICUS), win.z, level=1)
+        y0, y1, x0, x1 = 0, ny_, 0, nx_
+    win = read_slice_window_cos_level1(stores, z2, y0, y1, x0, x1)
+    axis = axis_at(load_control_points(DATA / f"{args.scroll}_umbilicus.json"), win.z, level=1)
     nx, ny, _ = orient_normals(win.nx, win.ny, win.y0, win.x0, axis)
     field = wrapped_phase(win.cos, nx, ny, window=args.window, smooth_sigma=args.smooth, grad_mag=win.grad_mag, min_grad_mag=1e-6)
     masked = np.ma.array(field.phi.astype(np.float64), mask=~field.valid)

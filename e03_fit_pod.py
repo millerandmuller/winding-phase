@@ -42,13 +42,23 @@ from pathlib import Path
 
 VILLA_SHA = "6bbe6e2"
 PCU_SHA = "4f4997a"
-Z0, Z1 = 8500, 9500
 STEPS = 12000
 S3 = "https://vesuvius-challenge-open-data.s3.us-east-1.amazonaws.com"
-LAS = "PHerc0826/representations/predictions/lasagna/20250821151701-lasagna-20260419180421"
-TRACKS = "https://dl.ash2txt.org/datasets/spiral_datasets/PHerc0826/20250821151701/tracks/PHerc0826_20250821151701_surface_m7_L0_th0.2.dbm"
-UMBILICUS = f"{S3}/PHerc0826/representations/umbilicus/20250821151701-umbilicus-20260808113303.json"
 EMPTY = {"vc_pointcollections_json_version": "1", "collections": {}}
+
+# Per-scroll inputs (open-data bucket and dl.ash2txt.org; inventory 2026-10-23).
+# z0, z1: the band PCU's constraints cover; the catalog flags (z top to bottom,
+# right-handed) are the same for both scrolls, so the spiral sense is CW for both.
+SCROLLS = {
+    "PHerc0826": {"volume": "20250821151701", "lasagna": "20250821151701-lasagna-20260419180421",
+                  "tracks": "PHerc0826_20250821151701_surface_m7_L0_th0.2.dbm",
+                  "umbilicus": "20250821151701-umbilicus-20260808113303.json", "z0": 8500, "z1": 9500,
+                  "pcu_file": "data/gold/pcu_gold_0826_fit_v2.json", "gold_file": "data/gold/gold0826_heldout8.json"},
+    "PHerc0211": {"volume": "20250821151803", "lasagna": "20250821151803-lasagna-20260419180421",
+                  "tracks": "PHerc0211_20250821151803_surface_m7_L0_th0.2.dbm",
+                  "umbilicus": "20250821151803-umbilicus-20260808112626.json", "z0": 9500, "z1": 10500,
+                  "pcu_file": None, "gold_file": None},  # pass --pcu-file and --gold (from e03_split_gold.py)
+}
 T0 = time.time()
 
 
@@ -101,20 +111,23 @@ def install(work: Path) -> tuple[Path, Path]:
     return villa, pcu
 
 
-def assemble_dataset(work: Path, villa: Path) -> Path:
+def assemble_dataset(work: Path, villa: Path, scroll: str, sc: dict) -> Path:
     """Lasagna level-2 stores packed into resident pools, tracks, umbilicus."""
     import requests
 
+    las_root = f"{scroll}/representations/predictions/lasagna/{sc['lasagna']}"
+    tracks_url = f"https://dl.ash2txt.org/datasets/spiral_datasets/{scroll}/{sc['volume']}/tracks/{sc['tracks']}"
+    umbilicus_url = f"{S3}/{scroll}/representations/umbilicus/{sc['umbilicus']}"
     ds = work / "ds"
     las = ds / "lasagna_inputs"
     las.mkdir(parents=True, exist_ok=True)
     packed = bool(glob.glob(str(las / "*.respool_g2*")))
     if not packed:
         for ch in ("nx", "ny", "grad_mag"):
-            dst = las / f"PHerc0826_{ch}.ome.zarr"
-            sh(f"aws s3 sync --no-sign-request --only-show-errors s3://vesuvius-challenge-open-data/{LAS}/PHerc0826_{ch}.ome.zarr/2 {dst}/2")
+            dst = las / f"{scroll}_{ch}.ome.zarr"
+            sh(f"aws s3 sync --no-sign-request --only-show-errors s3://vesuvius-challenge-open-data/{las_root}/{scroll}_{ch}.ome.zarr/2 {dst}/2")
             for f in (".zattrs", ".zgroup"):
-                r = requests.get(f"{S3}/{LAS}/PHerc0826_{ch}.ome.zarr/{f}", timeout=120)
+                r = requests.get(f"{S3}/{las_root}/{scroll}_{ch}.ome.zarr/{f}", timeout=120)
                 if r.ok:
                     (dst / f).write_bytes(r.content)
         py = villa / "spiral-fitting/.venv/bin/python"
@@ -122,25 +135,25 @@ def assemble_dataset(work: Path, villa: Path) -> Path:
         # The fitter reads the normals and grad_mag only through the packed
         # sidecars; the raw chunks (about 8 GB) would otherwise fill a 50 GB pod.
         for ch in ("nx", "ny", "grad_mag"):
-            shutil.rmtree(las / f"PHerc0826_{ch}.ome.zarr" / "2", ignore_errors=True)
+            shutil.rmtree(las / f"{scroll}_{ch}.ome.zarr" / "2", ignore_errors=True)
         shutil.rmtree(Path.home() / ".cache/uv", ignore_errors=True)
     tracks = ds / "tracks"
-    index = requests.get(TRACKS + ".vctracks/", timeout=120).text
+    index = requests.get(tracks_url + ".vctracks/", timeout=120).text
     vfiles = [n for n in re.findall(r'href="([^"/]+)"', index) if not n.startswith("..")]
-    jobs = [(TRACKS, tracks / "PHerc0826.dbm"), (TRACKS + ".crossings.npz", tracks / "PHerc0826.dbm.crossings.npz")]
-    jobs += [(f"{TRACKS}.vctracks/{f}", tracks / "PHerc0826.dbm.vctracks" / f) for f in vfiles]
+    jobs = [(tracks_url, tracks / f"{scroll}.dbm"), (tracks_url + ".crossings.npz", tracks / f"{scroll}.dbm.crossings.npz")]
+    jobs += [(f"{tracks_url}.vctracks/{f}", tracks / f"{scroll}.dbm.vctracks" / f) for f in vfiles]
     with ThreadPoolExecutor(6) as ex:
         results = list(ex.map(lambda a: fetch(*a), jobs))
     print("tracks fetched", sum(results), "of", len(jobs), flush=True)
-    (ds / "umbilicus.json").write_text(json.dumps(requests.get(UMBILICUS, timeout=120).json()))
+    (ds / "umbilicus.json").write_text(json.dumps(requests.get(umbilicus_url, timeout=120).json()))
     return ds
 
 
-def in_band(collections: dict) -> dict:
-    return {k: c for k, c in collections.items() if all(Z0 <= p["p"][2] < Z1 for p in c["points"].values())}
+def in_band(collections: dict, z0: int, z1: int) -> dict:
+    return {k: c for k, c in collections.items() if all(z0 <= p["p"][2] < z1 for p in c["points"].values())}
 
 
-def variant(work: Path, ds: Path, name: str, relative: dict) -> Path:
+def variant(work: Path, ds: Path, name: str, relative: dict, scroll: str) -> Path:
     """A dataset root per run: shared inputs symlinked, its own constraint file."""
     root = work / f"ds_{name}"
     root.mkdir(exist_ok=True)
@@ -151,12 +164,12 @@ def variant(work: Path, ds: Path, name: str, relative: dict) -> Path:
         (root / f).write_text(json.dumps(EMPTY))
     (root / "relative_windings.json").write_text(json.dumps(relative))
     (root / "spiral-scroll.json").write_text(json.dumps({
-        "schema_version": 1, "name": f"PHerc0826_{name}", "voxel_size_um": 9.362, "spiral_outward_sense": "CW",
+        "schema_version": 1, "name": f"{scroll}_{name}", "voxel_size_um": 9.362, "spiral_outward_sense": "CW",
         "normal_zarr_group": "2", "lasagna_scale": 4,
-        "paths": {"tracks_dbm": "tracks/PHerc0826.dbm",
-                  "normal_x": "lasagna_inputs/PHerc0826_nx.ome.zarr",
-                  "normal_y": "lasagna_inputs/PHerc0826_ny.ome.zarr",
-                  "gradient_magnitude": "lasagna_inputs/PHerc0826_grad_mag.ome.zarr"}}))
+        "paths": {"tracks_dbm": f"tracks/{scroll}.dbm",
+                  "normal_x": f"lasagna_inputs/{scroll}_nx.ome.zarr",
+                  "normal_y": f"lasagna_inputs/{scroll}_ny.ome.zarr",
+                  "gradient_magnitude": f"lasagna_inputs/{scroll}_grad_mag.ome.zarr"}}))
     return root
 
 
@@ -177,8 +190,8 @@ RUNS = {
 }
 
 
-def fit_config(use_relative: bool) -> dict:
-    cfg = {"z_begin": Z0, "z_end": Z1, "optimizer_num_training_steps": STEPS,
+def fit_config(use_relative: bool, z0: int, z1: int) -> dict:
+    cfg = {"z_begin": z0, "z_end": z1, "optimizer_num_training_steps": STEPS,
            "input_use_tracks": True, "input_use_fibers": False, "input_use_fiber_directions": False,
            "input_use_verified_patches": False, "input_use_winding_inference": False,
            "input_use_pcl_absolute": False, "input_use_pcl_same_winding": False,
@@ -220,7 +233,10 @@ def stack_grids(work: Path, name: str) -> Path:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--ours", type=Path, required=True, help="our relative_windings.json (level-0, integer keys)")
+    ap.add_argument("--ours", type=Path, default=None, help="our relative_windings.json (level-0, integer keys); not needed for A0 only")
+    ap.add_argument("--scroll", default="PHerc0826", choices=sorted(SCROLLS))
+    ap.add_argument("--pcu-file", type=Path, default=None, help="PCU's constraint file; default from the PCU repo for PHerc0826")
+    ap.add_argument("--gold", type=Path, default=None, help="held-out gold ladders for the eval; default from the PCU repo for PHerc0826")
     ap.add_argument("--work", type=Path, default=Path("/workspace/e03"))
     ap.add_argument("--runs", default="A0,PCU,OURS")
     ap.add_argument("--gpus", default="0", help="comma list; runs are spread over these and run in parallel per GPU")
@@ -228,21 +244,30 @@ def main() -> None:
     args = ap.parse_args()
     work = args.work
     work.mkdir(parents=True, exist_ok=True)
+    sc = SCROLLS[args.scroll]
+    z0, z1 = sc["z0"], sc["z1"]
     villa, pcu = install(work)
-    ds = assemble_dataset(work, villa)
+    ds = assemble_dataset(work, villa, args.scroll, sc)
 
-    ours = json.loads(args.ours.read_text())
-    ours["collections"] = in_band(ours["collections"])
-    pcu_file = pcu / "data/gold/pcu_gold_0826_fit_v2.json"
-    pcu_rel = json.loads(pcu_file.read_text())
-    pcu_rel["collections"] = in_band(pcu_rel["collections"])
-    print("constraint ladders in band: ours", len(ours["collections"]), "PCU", len(pcu_rel["collections"]), flush=True)
+    wanted = {RUNS[n][0] for n in args.runs.split(",")}
+    sources = {None: EMPTY}
+    if "ours" in wanted:
+        ours = json.loads(args.ours.read_text())
+        ours["collections"] = in_band(ours["collections"], z0, z1)
+        sources["ours"] = ours
+    if "pcu" in wanted:
+        pcu_file = args.pcu_file or (pcu / sc["pcu_file"] if sc["pcu_file"] else None)
+        if pcu_file is None:
+            raise SystemExit(f"--pcu-file is required for {args.scroll}")
+        pcu_rel = json.loads(Path(pcu_file).read_text())
+        pcu_rel["collections"] = in_band(pcu_rel["collections"], z0, z1)
+        sources["pcu"] = pcu_rel
+    print("constraint ladders in band:", {k: len(v["collections"]) for k, v in sources.items() if k}, flush=True)
 
-    sources = {None: EMPTY, "pcu": pcu_rel, "ours": ours}
     runs = {}
     for name in args.runs.split(","):
         source, extra = RUNS[name]
-        runs[name] = (variant(work, ds, name, sources[source]), dict(fit_config(source is not None), **extra))
+        runs[name] = (variant(work, ds, name, sources[source], args.scroll), dict(fit_config(source is not None, z0, z1), **extra))
     gpus = args.gpus.split(",")
     if not args.skip_fit:
         # one fit at a time per GPU; the rest queue behind it
@@ -262,10 +287,12 @@ def main() -> None:
             time.sleep(30)
     for name in runs:
         stack_grids(work, name)
-    gold = pcu / "data/gold/gold0826_heldout8.json"
+    gold = args.gold or (pcu / sc["gold_file"] if sc["gold_file"] else None)
+    if gold is None:
+        raise SystemExit(f"--gold is required for {args.scroll}")
     for name in runs:
         # the eval globs runs/kaggle/<run>/grids_*.npz relative to the working directory
-        sh(f"cd {work} && LADDERS={gold} Z0={Z0} Z1={Z1} python {pcu}/exp/e43_eval_gold.py {name} 2>&1 | tee {work}/eval_{name}.txt",
+        sh(f"cd {work} && LADDERS={gold} Z0={z0} Z1={z1} python {pcu}/exp/e43_eval_gold.py {name} 2>&1 | tee {work}/eval_{name}.txt",
            check=False)
     print("total", f"{time.time() - T0:.0f}s", flush=True)
 
