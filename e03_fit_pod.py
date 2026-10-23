@@ -171,6 +171,9 @@ RUNS = {
     "OURS_d8400": ("ours", {"sample_count_unattached_pcls_per_step": 8400}),
     "OURS_w40": ("ours", {"loss_weight_unattached_pcl_radius": 40.0}),
     "OURS_d8400_w40": ("ours", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
+    # the same two settings on PCU's file, so a gain is not an artefact of the settings
+    "PCU_w40": ("pcu", {"loss_weight_unattached_pcl_radius": 40.0}),
+    "PCU_d8400_w40": ("pcu", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
 }
 
 
