@@ -1,0 +1,2 @@
+ladders 3000 pairs 5788
+OURS_s2: slips 1681/4832 = 0.3479 per wrap; unassigned points 1112

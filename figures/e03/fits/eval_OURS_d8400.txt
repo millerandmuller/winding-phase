@@ -1,0 +1,2 @@
+ladders 3000 pairs 5788
+OURS_d8400: slips 1657/4811 = 0.3444 per wrap; unassigned points 1111

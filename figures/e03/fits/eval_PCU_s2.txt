@@ -1,0 +1,2 @@
+ladders 3000 pairs 5788
+PCU_s2: slips 1730/4708 = 0.3675 per wrap; unassigned points 1235
