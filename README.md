@@ -139,7 +139,7 @@ The band file for the fitter is built: z 8500 to 9492 every 16 (63 slices, PCU's
 
 ![slips per wrap](figures/e03/fits/slips_per_wrap.png)
 
-PCU published 50.1% and 36.3% for the first two rows on a T4; the reproduction here is within half a point of both, so the third row is comparable to their numbers. Ours matches PCU's constraint set on PCU's own scroll, with 2% more assigned pairs and 10% fewer unassigned points; the difference in slips (35.9 against 36.1) is noise. What differs is the source: PCU's ladders are certified against a global winding field and a density model; ours come from the cosine, the normals and grad_mag of one Lasagna run, with the sign read off a tracks-only fit, and nothing else.
+PCU published 50.1% and 36.3% for the first two rows on a T4; the reproduction here is within half a point of both, so the third row is comparable to their numbers. At PCU's settings and seed, ours matches PCU's constraint set on PCU's own scroll, with 2% more assigned pairs and 10% fewer unassigned points; the difference in slips (35.9 against 36.1) is noise. The second round below separates the two. What differs is the source: PCU's ladders are certified against a global winding field and a density model; ours come from the cosine, the normals and grad_mag of one Lasagna run, with the sign read off a tracks-only fit, and nothing else.
 
 What the first fit did not do: it satisfied 27% of our ladders against 47% of PCU's. With ten times the ladders at the same 840 draws per step, each of ours was sampled a tenth as often. So the second round (same pod recipe, five more fits) varied the seed, the draw rate and the strip weight:
 
@@ -151,7 +151,9 @@ What the first fit did not do: it satisfied 27% of our ladders against 47% of PC
 | ours, strip radius weight 40 | 33.5% (1,628 of 4,854) | 4,854 | 1,081 | 29.6% |
 | ours, 8,400 draws and weight 40 | **32.1%** (1,570 of 4,890) | 4,890 | 1,029 | 40.5% |
 
-Over two seeds at PCU's settings, ours averages 35.4% against PCU's 36.4%. Letting the fitter use the density (ten times the draws, double the radius weight) takes it to 32.1%, four points below PCU's best, with the most assigned pairs and the fewest unassigned points of any run. [CONTROL: the same two settings on PCU's file: PCU_W40 and PCU_D8400_W40.]
+Over two seeds at PCU's settings, ours averages 35.4% against PCU's 36.4%. Letting the fitter use the density (ten times the draws, double the radius weight) takes ours to 32.1%, four points below PCU's best, with the most assigned pairs and the fewest unassigned points of any run. The same two settings on PCU's file do not help it: weight 40 gives 36.9% (1,779 of 4,822), both settings 38.4% (1,807 of 4,707). The gain comes from the constraint set, not from the settings.
+
+**In one sentence:** on PHerc0826, relative-winding constraints built from one Lasagna run and nothing else take the spiral fitter from 49.5% to 32.1% slips per wrap on PCU's held-out ladders, four points further than PCU's certified constraints at their best, with no human step.
 
 Pod time: about 3.5 hours including a first attempt that filled the 50 GB disk. Files: `figures/e03/fits/` (eval lines, satisfaction metrics); the three fitted grids (19 MB each) are kept outside the repository: SHA256 A0 `faa40111...`, PCU `0b2a8aa3...`, ours `b3738dea...`.
 
