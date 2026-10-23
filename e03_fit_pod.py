@@ -22,7 +22,7 @@ run (one (3, rows, cols) array of x, y, z per winding) and the eval line
 "<run>: slips S/T = f per wrap" from PCU's exp/e43_eval_gold.py on the eight
 held-out slices (gold0826_heldout8.json).
 
-Needs: an NVIDIA GPU with 16 GB (PCU used a Kaggle T4), about 25 GB of disk
+Needs: an NVIDIA GPU (tested on 24 and 32 GB; PCU used a 16 GB Kaggle T4 for their smaller file), about 25 GB of disk
 for the Lasagna level-2 stores and tracks, network access to the open-data
 bucket, dl.ash2txt.org and GitHub. Python 3.14 is installed by uv.
 """

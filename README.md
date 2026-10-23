@@ -2,7 +2,7 @@
 
 **Can Lasagna's cosine channel be treated as a wrapped phase and unwrapped, InSAR style, into winding constraints for the villa spiral fitter?**
 
-Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconstruction works and tracks the sheets; the residues form a uniform, z-persistent background rather than marking merges or tears. Scored on PCU's first held-out slice with 1-, 2- and 3-wrap gold pairs: three independent winding estimates (2D unwrap, ridge count, integrated grad_mag density) agree on 46% of pairs and are then 99.8% right; ridge count plus density alone cover 75% at 98.7%. No constraints exported yet, nothing scored against a fit.
+Status, 2026-10-24. On one band of PHerc0826 (z 8500 to 9500), relative-winding constraints generated from one Lasagna run take villa's spiral fitter from 49.5% to 32.1% slips per wrap on PCU's held-out ladders (95% interval 30.7 to 33.6), against 36.1% for PCU's published constraint set at its best. Two caveats carry through the whole README. The scoring ladders are PCU's, built from the same Lasagna output; they measure agreement with PCU's reading of Lasagna, not with human-traced windings. And the result is one band of one scroll. A second scroll (PHerc0211) and a check against human labels (Paris 4) are the next experiments.
 
 ## What is here
 
@@ -20,7 +20,14 @@ Status, 2026-10-21: one slice of PHerc0826, full width at level 1. Phase reconst
 | `e02a_gates.py` | Precision against coverage for three confidence gates |
 | `e02a_failures.py` | Failing pairs drawn over the phase; failure rate by pair length and radius |
 | `e02a_certify.py` | Ridge-count and density votes on 1-wrap pairs |
-| `e02a_kwrap.py` | All votes and certificates on 1-, 2- and 3-wrap pairs (the scoreboard above) |
+| `e02a_kwrap.py` | All votes and certificates on 1-, 2- and 3-wrap pairs (the scoreboard below) |
+| `e02a_heldout8.py` | Pools the k-wrap scores over PCU's eight held-out slices |
+| `e03_ladders.py` | Generates certified winding ladders on one slice (`--scroll` selects the scroll) |
+| `e03_sign.py` | Orients each ladder by the winding gradient of a prior fit grid |
+| `e03_merge_band.py` | Merges per-slice ladders into the fitter's `relative_windings.json` |
+| `e03_split_gold.py` | Holds out every n-th slice of a PCU gold band for scoring |
+| `e03_fit_pod.py` | Builds the fitter dataset on a GPU machine, runs the fits, runs PCU's eval |
+| `e03_figure.py` | Slips-per-wrap chart from the eval lines |
 
 ## Run
 
@@ -62,7 +69,7 @@ Resolution matters, orientation of the normals does not. At level 2 (37 µm per 
 
 **Reading.** The residues are not noise and not a border or mask effect: they persist along z and survive smoothing. But they do not localise on anything visible either. Their density is the same on and off papyrus, flat across the scroll, and independent of Lasagna's confidence. On this slice the field has a uniform background of fringe dislocations, about four per 1,000 cells, running through z. So the residue map on its own is not a missed-sheet detector here. For unwrapping that background is what a minimum-cost-flow solver has to route branch cuts around; whether the cuts land on real sheet ambiguities is a question for scoring against the PCU held-out ladders, not for this figure.
 
-Not done: no unwrapping, no constraints exported, no comparison with a fit. One slice of one scroll.
+This first experiment covered one slice and no fit; the sections below take it to a fit.
 
 ## Scored against PCU's held-out ladders (E-02a, same day)
 
@@ -151,22 +158,41 @@ What the first fit did not do: it satisfied 27% of our ladders against 47% of PC
 | ours, strip radius weight 40 | 33.5% (1,628 of 4,854) | 4,854 | 1,081 | 29.6% |
 | ours, 8,400 draws and weight 40 | **32.1%** (1,570 of 4,890) | 4,890 | 1,029 | 40.5% |
 
-Over two seeds at PCU's settings, ours averages 35.4% against PCU's 36.4%. Letting the fitter use the density (ten times the draws, double the radius weight) takes ours to 32.1%, four points below PCU's best, with the most assigned pairs and the fewest unassigned points of any run. The same two settings on PCU's file do not help it: weight 40 gives 36.9% (1,779 of 4,822), both settings 38.4% (1,807 of 4,707). The gain comes from the constraint set, not from the settings.
+Over two seeds at PCU's settings, ours averages 35.4% against PCU's 36.4%. Letting the fitter use the density (ten times the draws, double the radius weight) takes ours to 32.1%, four points below PCU's best, with the most assigned pairs and the fewest unassigned points of any run. The same two settings on PCU's file do not help it: weight 40 gives 36.9% (1,779 of 4,822), both settings 38.4% (1,807 of 4,707). Each set at its best: PCU 36.1%, ours 32.1%. At matched settings the two sets are within about a point of each other; the gain appears when the denser set and the higher draw rate and weight are combined, and those settings make PCU's sparser set worse.
 
-**In one sentence:** on PHerc0826, relative-winding constraints built from one Lasagna run and nothing else take the spiral fitter from 49.5% to 32.1% slips per wrap on PCU's held-out ladders, four points further than PCU's certified constraints at their best, with no human step.
+**How sure is this?** All ten grids re-scored with PCU's own `exp/e31b_bootstrap.py` (same 3,000 ladders, seed 0; 2,000 ladder-level resamples, paired against PCU's seed-1 run):
 
-Pod time: about 3.5 hours including a first attempt that filled the 50 GB disk. Files: `figures/e03/fits/` (eval lines, satisfaction metrics); the three fitted grids (19 MB each) are kept outside the repository: SHA256 A0 `faa40111...`, PCU `0b2a8aa3...`, ours `b3738dea...`.
+| Run | Slips per wrap (95% interval) | Difference from PCU, seed 1, in points (95% interval) |
+|---|---|---|
+| tracks only | 49.5% (47.8 to 51.2) | +13.4 (+11.9 to +15.1) |
+| PCU, seed 1 | 36.1% (34.5 to 37.7) | reference |
+| PCU, seed 2 | 36.7% (35.2 to 38.4) | +0.6 (-0.8 to +2.0) |
+| PCU, weight 40 | 36.9% (35.4 to 38.4) | +0.8 (-0.7 to +2.2) |
+| PCU, 8,400 draws and weight 40 | 38.4% (36.7 to 40.1) | +2.3 (+0.9 to +3.8) |
+| ours, seed 1 | 35.9% (34.4 to 37.5) | -0.2 (-1.8 to +1.5) |
+| ours, seed 2 | 34.8% (33.3 to 36.4) | -1.3 (-3.0 to +0.4) |
+| ours, 8,400 draws | 34.4% (33.0 to 35.8) | -1.7 (-3.3 to -0.1) |
+| ours, weight 40 | 33.5% (32.1 to 35.0) | -2.6 (-4.3 to -0.9) |
+| ours, 8,400 draws and weight 40 | 32.1% (30.7 to 33.6) | -4.0 (-5.7 to -2.3) |
+
+The sampling of ladders cannot explain the best run's lead; its paired interval stays clear of zero. At PCU's settings the two sets cannot be told apart. Choosing the best of our four settings on the scoring ladders does not explain it either: picking the setting on a random half of the ladders and scoring the pick on the other half (200 splits, PCU's selection-free check) chooses ours, weight 40 8, ours, 8,400 draws and weight 40 192, and the pick scores 32.2% (range 30.7 to 34.2) against 36.1% for PCU on the same halves. Not covered by these intervals: seed-to-seed variation (about a point here; the best setting has one seed), and the generator settings (density scale 1.23, band 0.35, sign radius 120), which were tuned on the same held-out slices before any fit.
+
+**What the scoring set can and cannot say.** PCU's held-out ladders are certified from the same Lasagna run that our constraints come from (PCU's README marks them "not human labels"). A fit pushed towards Lasagna's reading may agree better with Lasagna-derived ladders without being more correct. One number points that way: the share of independent surface tracks the fit satisfies falls as our constraints get stronger (tracks only 7.5%, PCU's set 6.9%, ours 6.0% at PCU's settings, 5.3% at the best setting). The comparison with PCU is less exposed, since PCU's own constraints come from the same generator as the scoring set, which should favour them. A check against human-traced windings (Paris 4, 1,502 labelled pairs) is the next experiment.
+
+**On one line:** each at its best on this band, PCU's certified constraints give 36.1% slips per wrap and ours 32.1%, from a single Lasagna run with the sign taken from a tracks-only fit; whether that is fewer real winding errors needs human labels.
+
+Pod time: about 3.5 hours including a first attempt that filled the 50 GB disk. Fits ran on 24 GB and 32 GB cards; PCU ran their 26k-ladder file on a 16 GB T4, and the 268k-ladder file at 8,400 draws per step was not tried on 16 GB. Files: `figures/e03/fits/` (eval lines, satisfaction metrics); the three fitted grids (19 MB each) are kept outside the repository: SHA256 A0 `faa40111...`, PCU `0b2a8aa3...`, ours `b3738dea...`.
 
 
 ## Data
 
 - Lasagna product: `PHerc0826/representations/predictions/lasagna/20250821151701-lasagna-20260419180421/` on the open-data bucket (model 20260419180421). Channels cos, grad_mag, nx, ny; no sin or direction channels. Encodings in `lasagna_store.py`.
 - CT: `PHerc0826/volumes/20250821151701-9.362um-1.2m-113keV-masked.zarr`.
-- Umbilicus: `data/PHerc0826_umbilicus.json`, ours, see `data/README.md`.
+- Umbilicus: `data/PHerc0826_umbilicus.json`, hand-annotated by us (see `data/README.md`), used only to orient normals in the generator; the fitter uses the organizers' umbilicus. This is the one human input in the PHerc0826 pipeline; the PHerc0211 run uses the organizers' file for both.
 
 ## Baseline to beat
 
-Gill and Tran's PCU tool (https://github.com/Jashann/vesuvius-scrolling): certified relative-winding constraints, 99.62% precision at 70% coverage on Paris 4; on PHerc0826 their held-out set (`gold0826_heldout8.json`) and fit grids are published and are the scoring target here.
+Gill and Tran's PCU tool (https://github.com/Jashann/vesuvius-scrolling) already reads Lasagna's cosine as a wrapped phase and counts windings three ways from it (local phase cycles, an integral of wrap density, a whole-slice unwrapped field), keeping only pairs where all three agree, with the recto-surface network as a fourth vote for its gold tier: 99.62% precision at 70% coverage on Paris 4. On PHerc0826 their held-out set (`gold0826_heldout8.json`), constraint file and fit grids are published and are the scoring target here. The certificate in this repository (E-02a) is therefore a re-implementation of the same idea and mostly shows agreement with PCU's reading. What is new: a ridge-walk generator that chooses its own ladders and certifies each hop with two votes (density band and 2D unwrap), dropping PCU's global-field and recto votes; ten times the density on the same slices; the sign read from a tracks-only fit's winding gradient; and the finding that the fitter gains from that density when it draws more ladders per step at a higher strip weight, while PCU's sparser set does not.
 
 ## How this was built
 
