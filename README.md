@@ -2,7 +2,7 @@
 
 **Can Lasagna's cosine channel be treated as a wrapped phase and unwrapped, InSAR style, into winding constraints for the villa spiral fitter?**
 
-Status, 2026-10-24. On one band of PHerc0826 (z 8500 to 9500), relative-winding constraints generated from one Lasagna run take villa's spiral fitter from 49.5% to 32.1% slips per wrap on PCU's held-out ladders (95% interval 30.7 to 33.6), against 36.1% for PCU's published constraint set at its best. Two caveats carry through the whole README. The scoring ladders are PCU's, built from the same Lasagna output; they measure agreement with PCU's reading of Lasagna, not with human-traced windings. And the result is one band of one scroll. A second scroll (PHerc0211) and a check against human labels (Paris 4) are the next experiments.
+Status, 2026-10-24. Relative-winding constraints generated from one Lasagna run were fed to villa's spiral fitter on three scrolls, each time against PCU's published constraint set under the same fitter and scoring. PHerc0826 (z 8500 to 9500): 32.1% slips per wrap against 36.1% for PCU at its best and 49.5% with no constraints. PHerc0211 (z 9500 to 10500, the second eligible scroll, nothing re-tuned): 24.9% against 30.1% for PCU and 40.1% with none, a paired difference of 5.2 points (3.8 to 6.6). Both of those are scored on PCU's held-out ladders, which come from the same Lasagna output, so they measure agreement with PCU's reading of Lasagna. On Paris 4, scored on human-traced ladders, ours and PCU's tie: 7.8% and 9.9% over two seeds at our best setting, against 8.3% for PCU at the same setting, 10.5% at PCU's own, and 20.1% with no constraints. The human test has 32 ladders, so it cannot separate the two sets; it does show that the constraints help on human labels as much as PCU's do.
 
 ## What is here
 
@@ -177,18 +177,56 @@ Over two seeds at PCU's settings, ours averages 35.4% against PCU's 36.4%. Letti
 
 The sampling of ladders cannot explain the best run's lead; its paired interval stays clear of zero. At PCU's settings the two sets cannot be told apart. Choosing the best of our four settings on the scoring ladders does not explain it either: picking the setting on a random half of the ladders and scoring the pick on the other half (200 splits, PCU's selection-free check) chooses ours, weight 40 8, ours, 8,400 draws and weight 40 192, and the pick scores 32.2% (range 30.7 to 34.2) against 36.1% for PCU on the same halves. Not covered by these intervals: seed-to-seed variation (about a point here; the best setting has one seed), and the generator settings (density scale 1.23, band 0.35, sign radius 120), which were tuned on the same held-out slices before any fit.
 
-**What the scoring set can and cannot say.** PCU's held-out ladders are certified from the same Lasagna run that our constraints come from (PCU's README marks them "not human labels"). A fit pushed towards Lasagna's reading may agree better with Lasagna-derived ladders without being more correct. One number points that way: the share of independent surface tracks the fit satisfies falls as our constraints get stronger (tracks only 7.5%, PCU's set 6.9%, ours 6.0% at PCU's settings, 5.3% at the best setting). The comparison with PCU is less exposed, since PCU's own constraints come from the same generator as the scoring set, which should favour them. A check against human-traced windings (Paris 4, 1,502 labelled pairs) is the next experiment.
+**What the scoring set can and cannot say.** PCU's held-out ladders are certified from the same Lasagna run that our constraints come from (PCU's README marks them "not human labels"). A fit pushed towards Lasagna's reading may agree better with Lasagna-derived ladders without being more correct. One number points that way: the share of independent surface tracks the fit satisfies falls as our constraints get stronger (tracks only 7.5%, PCU's set 6.9%, ours 6.0% at PCU's settings, 5.3% at the best setting). The comparison with PCU is less exposed, since PCU's own constraints come from the same generator as the scoring set, which should favour them. The check against human-traced windings is in [Human labels (Paris 4)](#human-labels-paris-4) below.
 
-**On one line:** each at its best on this band, PCU's certified constraints give 36.1% slips per wrap and ours 32.1%, from a single Lasagna run with the sign taken from a tracks-only fit; whether that is fewer real winding errors needs human labels.
+**On one line:** each at its best on this band, PCU's certified constraints give 36.1% slips per wrap and ours 32.1%, from a single Lasagna run with the sign taken from a tracks-only fit. The same recipe wins on a second scroll (below); on human labels the two sets tie.
 
 Pod time: about 3.5 hours including a first attempt that filled the 50 GB disk. Fits ran on 24 GB and 32 GB cards; PCU ran their 26k-ladder file on a 16 GB T4, and the 268k-ladder file at 8,400 draws per step was not tried on 16 GB. Files: `figures/e03/fits/` (eval lines, satisfaction metrics); the three fitted grids (19 MB each) are kept outside the repository: SHA256 A0 `faa40111...`, PCU `0b2a8aa3...`, ours `b3738dea...`.
 
+
+## Second scroll (PHerc0211)
+
+The same recipe on PHerc0211, z 9500 to 10500, with nothing re-tuned: generator settings as on PHerc0826 (band 0.35, density scale 1.23, stride 16), sign from this scroll's own tracks-only fit (radius 120), fitter settings as above (radius weight 20, dt 10, 840 draws, 12,000 steps, seed 1), tracks `PHerc0211_20250821151803_surface_m7_L0_th0.2`, the organizers' umbilicus for both generator and fitter. PCU have not published a held-out set for this scroll, so `e03_split_gold.py` holds out every eighth slice of PCU's PHerc0211 band (8 slices, 3,817 ladders) and gives the other 55 slices to the fit (PCU's file: 26,944 ladders). Ours is generated on the same 55 slices: 262,453 ladders, 959,063 points; 251,736 signed by the tracks-only grid, 9,164 reversed by it, 1,553 at the band edge kept outward. Scored with PCU's `exp/e43_eval_gold.py` (3,000 ladders, 5,989 pairs, seed 0) and `exp/e31b_bootstrap.py` (2,000 ladder-level resamples, paired against PCU at its default settings):
+
+| Constraints | Slips per wrap (95% interval) | Difference from PCU in points (95% interval) | Assigned pairs | Tracks satisfied |
+|---|---|---|---|---|
+| none (tracks only) | 40.1% (38.7 to 41.5) | +10.0 (+8.5 to +11.5) | 4,672 | 15.1% |
+| PCU's | 30.1% (28.8 to 31.3) | reference | 5,199 | 13.7% |
+| PCU's, weight 40 | 28.5% (27.3 to 29.7) | -1.6 (-3.0 to -0.2) | 5,278 | 13.9% |
+| PCU's, 8,400 draws and weight 40 | 30.4% (29.1 to 31.7) | +0.3 (-1.1 to +1.7) | 5,191 | 14.0% |
+| **ours** | **24.9% (23.8 to 26.0)** | **-5.2 (-6.6 to -3.8)** | 5,337 | 10.9% |
+| ours, weight 40 | 24.2% (23.0 to 25.5) | -5.9 (-7.3 to -4.4) | 5,346 | 10.8% |
+| ours, 8,400 draws and weight 40 | 24.1% (22.8 to 25.3) | -6.0 (-7.5 to -4.5) | 5,356 | 9.7% |
+
+Here ours leads at PCU's own settings, by more than on PHerc0826, and the higher draw rate and weight add little. Against PCU at its best on this scroll (weight 40, 28.5%) the default run is 3.6 points lower. Choosing among our three settings on half the ladders and scoring on the other half gives 24.5% (23.7 to 25.5) against 30.1% for PCU on the same halves. One seed per run. The same two cautions as on PHerc0826 hold: the held-out ladders are PCU-certified from the same Lasagna output, and the share of surface tracks the fit satisfies falls under our constraints (15.1% tracks only, 13.7% PCU, 10.9% ours). Files: `figures/e03/0211/`.
+
+## Human labels (Paris 4)
+
+PHerc Paris 4 is the one scroll with human-traced winding ladders in the organizers' spiral dataset. It is not a Grand Prize scroll, and its Lasagna output is cleaner than the eligible scrolls'. To make the constraint file the only difference, the run copies PCU's published Paris 4 experiment: the spiral dataset as published, band z 8400 to 9400 in its 9.6 um frame, villa 6bbe6e2, PCU's settings (strip weights 10 and 10, 840 draws, 12,000 steps), and PCU's `exp/e31b_bootstrap.py human` on the 32 human ladders in the band (394 pairs). PCU's released grids rescore to their published numbers on this machine (tracks only 20.3%, their constraints 9.3%). Our ladders use PCU's 63 slices with the generator settings unchanged from PHerc0826 (593,806 ladders against PCU's 62,260), signed with PCU's released tracks-only grid. The human labels are never fit inputs.
+
+| Constraints | Slips per wrap (95% interval) | Difference from PCU in points (95% interval) | Assigned pairs | Tracks satisfied |
+|---|---|---|---|---|
+| none (tracks only) | 20.1% (16.8 to 24.6) | +9.6 (+5.3 to +15.0) | 294 | 20.9% |
+| PCU's, rerun here | 10.5% (7.1 to 13.8) | reference | 315 | 21.3% |
+| PCU's released grid, seeds 1 and 2 | 9.3%, 8.8% | -1.2, -1.6 (both intervals include 0) | 324, 339 | |
+| PCU's, 8,400 draws and weight 40 | 8.3% (5.0 to 12.6) | -2.2 (-5.1 to +1.5) | 339 | 21.8% |
+| ours | 14.4% (7.9 to 22.0) | +3.9 (-3.2 to +11.4) | 278 | 17.3% |
+| ours, 8,400 draws | 16.5% (12.0 to 22.5) | +6.0 (-0.1 to +14.1) | 321 | 15.5% |
+| ours, weight 40 | 13.1% (8.6 to 20.2) | +2.7 (-1.9 to +9.8) | 289 | 16.8% |
+| ours, 8,400 draws and weight 40, seed 1 | 7.8% (5.2 to 11.8) | -2.7 (-6.6 to +2.4) | 320 | 15.6% |
+| ours, 8,400 draws and weight 40, seed 2 | 9.9% (5.6 to 16.4) | -0.6 (-5.5 to +6.8) | 324 | 15.6% |
+
+On human labels the two constraint sets cannot be told apart. Both halve the slips of the tracks-only fit. At PCU's settings ours is a few points worse (not significant, with fewer assigned pairs); at our best setting it matches PCU at the same setting over two seeds (7.8% and 9.9% against 8.3%). Every interval that compares the sets includes zero. This is the result the PHerc0826 and PHerc0211 gains have to be read against. They are not a measured error reduction on human labels; on the one human test available, a generator that uses nothing but one Lasagna run does as well as PCU's certified set. The track signal points the same way as before. PCU's constraints leave track satisfaction where the tracks-only fit had it (21%), ours lowers it (15.6%), and the human score does not suffer. Files: `figures/e03/p4/`.
+
+A note for anyone repeating this: villa's point-collection reader rejects a file without `"vc_pointcollections_json_version": "1"`. PCU's released Paris 4 fit input has no such key (their own job adds it), and the first run here fitted the PCU rows without any constraints, at tracks-only scores. `e03_fit_pod.py` now writes the key for every run; the log line `pcls: 0 cross-patch, N unattached` shows how many ladders the fitter loaded.
 
 ## Data
 
 - Lasagna product: `PHerc0826/representations/predictions/lasagna/20250821151701-lasagna-20260419180421/` on the open-data bucket (model 20260419180421). Channels cos, grad_mag, nx, ny; no sin or direction channels. Encodings in `lasagna_store.py`.
 - CT: `PHerc0826/volumes/20250821151701-9.362um-1.2m-113keV-masked.zarr`.
 - Umbilicus: `data/PHerc0826_umbilicus.json`, hand-annotated by us (see `data/README.md`), used only to orient normals in the generator; the fitter uses the organizers' umbilicus. This is the one human input in the PHerc0826 pipeline; the PHerc0211 run uses the organizers' file for both.
+- PHerc0211: Lasagna `20250821151803-lasagna-20260419180421`, tracks `PHerc0211_20250821151803_surface_m7_L0_th0.2`, umbilicus `data/PHerc0211_umbilicus.json` (the organizers').
+- Paris 4: the organizers' spiral dataset `dl.ash2txt.org/datasets/spiral_datasets/PHercParis4/` (tracks, Lasagna respools, outer shell, human ladders), and Lasagna `PHercParis4-20260411134726-las-sd2-5b17ff6c` for our generator; umbilicus `data/PHercParis4_umbilicus.json` from the spiral dataset.
 
 ## Baseline to beat
 

@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "satisfied_patches": 0,
+    "total_patches": 0,
+    "satisfied_patches_fraction": 0.0,
+    "satisfied_patches_area": 0.0,
+    "all_patches_area": 0.0,
+    "satisfied_patches_area_weighted_fraction": 0.0,
+    "boundary_satisfied_patches": 0,
+    "boundary_total_patches": 0,
+    "boundary_satisfied_patches_fraction": 0.0,
+    "satisfied_area": 0.0,
+    "total_area": 0.0,
+    "satisfied_area_fraction": 0.0,
+    "satisfied_unattached_pcls": 13890,
+    "total_unattached_pcls": 26944,
+    "satisfied_unattached_pcls_fraction": 0.5155136579572447,
+    "satisfied_unattached_pcl_points": 42364,
+    "total_unattached_pcl_points": 68196,
+    "satisfied_unattached_pcl_points_fraction": 0.6212094551000059,
+    "satisfied_tracks": 89585,
+    "total_tracks": 640277,
+    "satisfied_tracks_fraction": 0.1399160051040409,
+    "satisfied_track_points": 17482631,
+    "total_track_points": 34286438,
+    "satisfied_track_points_fraction": 0.5098993077087798
+  }
+}

@@ -1,0 +1,2 @@
+ladders 3000 pairs 5989
+PCU_w40: slips 1504/5278 = 0.2850 per wrap; unassigned points 669
