@@ -230,6 +230,9 @@ RUNS = {
     # the same two settings on PCU's file, so a gain is not an artefact of the settings
     "PCU_w40": ("pcu", {"loss_weight_unattached_pcl_radius": 40.0}),
     "PCU_d8400_w40": ("pcu", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
+    "PCU_d8400_w40_s2": ("pcu", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0, "optimizer_random_seed": 2}),
+    # our ladders after the track-agreement vote (e05_vote.py), passed as --ours-vote
+    "OURS_vote_d8400_w40": ("vote", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
 }
 
 
@@ -290,6 +293,7 @@ def stack_grids(work: Path, name: str) -> Path:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--ours", type=Path, default=None, help="our relative_windings.json (level-0, integer keys); not needed for A0 only")
+    ap.add_argument("--ours-vote", type=Path, default=None, help="our ladders after e05_vote.py; needed for OURS_vote runs")
     ap.add_argument("--scroll", default="PHerc0826", choices=sorted(SCROLLS))
     ap.add_argument("--pcu-file", type=Path, default=None, help="PCU's constraint file; default from the PCU repo for PHerc0826")
     ap.add_argument("--gold", type=Path, default=None, help="held-out gold ladders for the eval; default from the PCU repo for PHerc0826")
@@ -315,6 +319,10 @@ def main() -> None:
         ours = json.loads(args.ours.read_text())
         ours["collections"] = in_band(ours["collections"], z0, z1)
         sources["ours"] = ours
+    if "vote" in wanted:
+        voted = json.loads(args.ours_vote.read_text())
+        voted["collections"] = in_band(voted["collections"], z0, z1)
+        sources["vote"] = voted
     if "pcu" in wanted:
         pcu_file = args.pcu_file or (pcu / sc["pcu_file"] if sc["pcu_file"] else None)
         if pcu_file is None:
