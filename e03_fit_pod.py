@@ -198,7 +198,8 @@ def variant(work: Path, ds: Path, name: str, relative: dict, scroll: str) -> Pat
             os.symlink(ds / entry, root / entry)
     for f in ("abs_winding.json", "same_windings.json"):
         (root / f).write_text(json.dumps(EMPTY))
-    (root / "relative_windings.json").write_text(json.dumps(relative))
+    # villa rejects a file without the version key (PCU's Paris 4 file has none; their job adds it too)
+    (root / "relative_windings.json").write_text(json.dumps(dict(relative, vc_pointcollections_json_version="1")))
     if SCROLLS[scroll].get("dataset") == "spiral":
         # PCU's Paris 4 scroll file: conventional paths, 9.6 um voxels.
         (root / "spiral-scroll.json").write_text(json.dumps({
@@ -225,6 +226,7 @@ RUNS = {
     "OURS_d8400": ("ours", {"sample_count_unattached_pcls_per_step": 8400}),
     "OURS_w40": ("ours", {"loss_weight_unattached_pcl_radius": 40.0}),
     "OURS_d8400_w40": ("ours", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
+    "OURS_d8400_w40_s2": ("ours", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0, "optimizer_random_seed": 2}),
     # the same two settings on PCU's file, so a gain is not an artefact of the settings
     "PCU_w40": ("pcu", {"loss_weight_unattached_pcl_radius": 40.0}),
     "PCU_d8400_w40": ("pcu", {"sample_count_unattached_pcls_per_step": 8400, "loss_weight_unattached_pcl_radius": 40.0}),
