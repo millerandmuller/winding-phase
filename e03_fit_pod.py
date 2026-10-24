@@ -297,11 +297,13 @@ def main() -> None:
     ap.add_argument("--runs", default="A0,PCU,OURS")
     ap.add_argument("--gpus", default="0", help="comma list; runs are spread over these and run in parallel per GPU")
     ap.add_argument("--skip-fit", action="store_true", help="only stack and evaluate existing outputs")
+    ap.add_argument("--z0", type=int, default=None, help="band start, overrides the scroll default (e.g. Paris 4 band 2: 11000)")
+    ap.add_argument("--z1", type=int, default=None, help="band end, overrides the scroll default")
     args = ap.parse_args()
     work = args.work
     work.mkdir(parents=True, exist_ok=True)
     sc = SCROLLS[args.scroll]
-    z0, z1 = sc["z0"], sc["z1"]
+    z0, z1 = args.z0 or sc["z0"], args.z1 or sc["z1"]
     villa, pcu = install(work)
     spiral = sc.get("dataset") == "spiral"
     ds = assemble_spiral_dataset(work) if spiral else assemble_dataset(work, villa, args.scroll, sc)
