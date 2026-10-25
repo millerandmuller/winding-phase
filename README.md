@@ -2,7 +2,7 @@
 
 **Can Lasagna's cosine channel be treated as a wrapped phase and unwrapped, InSAR style, into winding constraints for the villa spiral fitter?**
 
-Status, 2026-10-24. Relative-winding constraints generated from one Lasagna run were fed to villa's spiral fitter on three scrolls, each time against PCU's published constraint set under the same fitter and scoring. On PCU's held-out ladders, which come from the same Lasagna output as our constraints, ours lead on two eligible scrolls: PHerc0826 (z 8500 to 9500) 32.1% slips per wrap against 36.1% for PCU at its best and 49.5% with no constraints; PHerc0211 (z 9500 to 10500, nothing re-tuned) 24.9% against 30.1% for PCU and 40.1% with none. Those tests measure agreement with PCU's reading of Lasagna, not with the papyrus. On Paris 4, scored on 32 human-traced ladders, ours and PCU's cannot be told apart at the higher draw rate and strip weight (7.8% and 9.9% slips per wrap over two seeds, against 8.3% for PCU at the same setting and 20.1% with no constraints). At PCU's own settings ours does not help on human labels: it gets 60.4% of the 394 human pairs right, against 59.6% with no constraints and 71.6% with PCU's. A second Paris 4 band (z 11000 to 12000, 38 more human ladders) was then run under a decision rule fixed before the run. Pooled over both bands (70 ladders, 606 pairs), ours at the higher setting gets 70.1% of human pairs right against 56.8% with no constraints (+13.4, +8.0 to +18.3; second seed +13.0, +6.9 to +18.7), and 71.9% for PCU's set at the same setting (difference -1.8, -7.7 to +3.9). Ours improves the fit on human labels; it does not beat PCU's set there.
+Status, 2026-10-24. Relative-winding constraints generated from one Lasagna run were fed to villa's spiral fitter on three scrolls, each time against PCU's published constraint set under the same fitter and scoring. On PCU's held-out ladders, which come from the same Lasagna output as our constraints, ours lead on two eligible scrolls: PHerc0826 (z 8500 to 9500) 32.1% slips per wrap against 36.1% for PCU at its best and 49.5% with no constraints; PHerc0211 (z 9500 to 10500, nothing re-tuned) 24.9% against 30.1% for PCU and 40.1% with none. Those tests measure agreement with PCU's reading of Lasagna, not with the papyrus. On Paris 4, scored on 32 human-traced ladders, ours and PCU's cannot be told apart at the higher draw rate and strip weight (7.8% and 9.9% slips per wrap over two seeds, against 8.3% for PCU at the same setting and 20.1% with no constraints). At PCU's own settings ours does not help on human labels: it gets 60.4% of the 394 human pairs right, against 59.6% with no constraints and 71.6% with PCU's. A second Paris 4 band (z 11000 to 12000, 38 more human ladders) was then run under a decision rule fixed before the run. Pooled over both bands (70 ladders, 606 pairs), ours at the higher setting gets 70.1% of human pairs right against 56.8% with no constraints (+13.4, +8.0 to +18.3; second seed +13.0, +6.9 to +18.7), and 71.9% for PCU's set at the same setting (difference -1.8, -7.7 to +3.9). Ours improves the fit on human labels; it does not beat PCU's set there. Status, 2026-10-25: the same comparison on five further Paris 4 bands, fit here for the first time (103 human ladders, 837 pairs; our settings were not tuned on them, PCU's certificate tolerances were chosen on all Paris 4 human pairs), under a rule fixed before the run, gives the same answer: ours at the higher setting gets 57.9% of human pairs right against 49.7% with no constraints (+8.2, +2.9 to +13.1) and 56.9% for PCU's set at the same setting (+1.1, -3.5 to +6.1; second seeds -0.6, -5.4 to +4.9). The two constraint sets cannot be told apart on human labels (a gap under about 5 points would not show); the bands differ far more than the sets do.
 
 ## What is here
 
@@ -30,6 +30,8 @@ Status, 2026-10-24. Relative-winding constraints generated from one Lasagna run 
 | `e03_correct_of_all.py` | Runs PCU's `e31b_bootstrap.py` unchanged and adds correct pairs out of all pairs (unassigned counts as wrong), with paired intervals and per-ladder counts |
 | `e03_pool_bands.py` | Pools correct pairs out of all pairs over several bands with a paired, band-stratified ladder bootstrap |
 | `e03_figure.py` | Slips-per-wrap chart from the eval lines |
+| `e05_vote.py` | Track-agreement vote: drops ladder hops whose winding step a tracks-only fit contradicts |
+| `run_manifest.py` | Writes a run's manifest: code versions, packages, input and output hashes, seed and command line |
 
 ## Run
 
@@ -247,6 +249,46 @@ This band is harder for every fit (half the human pairs right with tracks only) 
 | ours, 8,400 draws and weight 40, seed 2 | 69.8% (62.6 to 74.9) | +13.0 (+6.9 to +18.7) | +3.0 (-3.2 to +8.8) | -2.1 (-8.6 to +3.6) |
 
 The rule fixed before the run was: ours at 8,400 draws and weight 40 (seed 1) against our own tracks-only fit, correct pairs out of all pairs pooled over both bands; an interval clear of zero with seed 2 on the same side means the constraints improve the fit on human labels. That is the outcome: +13.4 points, +8.0 to +18.3, seed 2 +13.0. What it does not show: an advantage over PCU's constraints. At the same setting the two sets are within two points of each other on 606 human pairs, with intervals of about ±6; at PCU's own settings PCU's set is ahead. Files: `figures/e03/p4/correct_of_all_p4b2.json`, `correct_of_all_p4_pooled*.json`.
+
+### Five more bands, fit for the first time here
+
+Bands 1 and 2 had been seen before this comparison was set up, so the question was asked again on the rest of Paris 4's human labels, with the comparison and the decision rule written down before any fit. No fit had been run on these bands before, and our generator and the fitter setting were not tuned on them (both come from PHerc0826). They are not fully unseen for PCU's set: PCU chose their certificate tolerances on all 1,502 Paris 4 human pairs, these 837 included (PCU README, Limitations); that favours PCU's set, if anything. Nobody has yet confirmed with the dataset's authors that the ladders outside the first two bands were traced to the same standard as those; the last band (five ladders, every fit 15 to 22% right) is where that matters most. Five 1,000-slice bands were chosen to hold as many of the remaining human pairs as possible without overlapping bands 1 and 2: z 9870 to 10870, 12490 to 13490, 13690 to 14690, 15030 to 16030 and 16900 to 17900. Together they hold 103 human ladders and 837 pairs (59 pairs outside all seven bands are not scored). For every band, everything was built fresh on one machine:
+
+- PCU's constraints from their own generator at release v1.1 (`exp/e13_band.py` at level-3 z with `STEP=8`, then `exp/e63_merge_gold.py`), 40,223 to 74,041 ladders per band;
+- our ladders on the same 63 slices with the generator unchanged, signed by that band's own tracks-only fit (not a released grid), 354,912 to 641,606 ladders per band;
+- the same fitter settings as above, and seven fits per band: tracks only, PCU's at its own settings, PCU's and ours at 8,400 draws and weight 40 (two seeds each), and ours after a track-agreement vote (`e05_vote.py`, below).
+
+All 35 fits loaded the full constraint count of their input file (`pcls: 0 cross-patch, N unattached`). The rule, fixed in advance, compares ours with PCU's at 8,400 draws and weight 40, seed 1, on correct pairs out of all 837 pairs pooled over the five bands. Seed 2 has to fall on the same side, and ours has to stay above tracks only for the generator to remain worth using.
+
+| Constraints | Correct of all 837 pairs (95% interval) | Difference from tracks only | Difference from PCU's at 8,400 draws and weight 40 | Slips per wrap (assigned pairs) |
+|---|---|---|---|---|
+| none (tracks only) | 49.7% (44.7 to 54.5) | reference | -7.2 (-13.6 to -0.1) | 30.6% (599) |
+| PCU's, own settings | 59.5% (53.1 to 65.3) | +9.8 (+5.2 to +13.9) | +2.6 (-2.9 to +8.6) | 14.0% (579) |
+| PCU's, 8,400 draws and weight 40, seed 1 | 56.9% (48.9 to 63.9) | +7.2 (+0.1 to +13.6) | reference | 18.5% (584) |
+| PCU's, 8,400 draws and weight 40, seed 2 | 57.6% (48.7 to 65.2) | +7.9 (+0.4 to +14.7) | +0.7 (-1.3 to +2.7) | 17.2% (582) |
+| ours, 8,400 draws and weight 40, seed 1 | 57.9% (50.5 to 63.9) | **+8.2 (+2.9 to +13.1)** | **+1.1 (-3.5 to +6.1)** | 17.0% (584) |
+| ours, 8,400 draws and weight 40, seed 2 | 57.0% (49.7 to 63.1) | +7.3 (+1.1 to +12.8) | +0.1 (-4.3 to +5.0) | 17.0% (575) |
+| ours after the track-agreement vote | 55.8% (49.7 to 61.4) | +6.1 (+1.5 to +10.2) | -1.1 (-5.6 to +3.9) | 22.3% (601) |
+
+Seed 2 of ours against seed 2 of PCU's: -0.6 (-5.4 to +4.9). So, on these bands the two sets cannot be told apart at matched settings: the difference is about one point, with an interval of about ±5, and a gap under about 5 points would not show. Both improve the fit over tracks only by 7 to 8 points. For ours the gain has the same direction as on bands 1 and 2 and clears zero again, but it is smaller (+8.2 against +13.4). PCU's set at its own settings scores highest here, by 2.6 points over the matched setting, with an interval that includes zero.
+
+The vote drops a ladder hop when the tracks-only fit reads a different winding step at its two ends. It removed 33 to 37% of hops per band and did not help (-2.2 against plain ours, -6.2 to +1.8): it is not used further.
+
+**Per band** (correct of all pairs, seed 1):
+
+| Band (z) | Ladders / pairs | Tracks only | PCU's, own settings | PCU's, 8,400 / 40 | ours, 8,400 / 40 | ours minus PCU's at 8,400 / 40 |
+|---|---|---|---|---|---|---|
+| 9870 to 10870 | 31 / 161 | 65.2% | 76.4% | 59.6% | 55.9% | -3.7 |
+| 12490 to 13490 | 18 / 132 | 51.5% | 51.5% | 47.7% | 53.8% | +6.1 |
+| 13690 to 14690 | 14 / 115 | 45.2% | 60.9% | 47.8% | 61.7% | +13.9 |
+| 15030 to 16030 | 35 / 344 | 51.7% | 63.4% | 72.4% | 69.2% | -3.2 |
+| 16900 to 17900 | 5 / 85 | 15.3% | 22.4% | 15.3% | 17.6% | +2.4 |
+
+The bands differ more than the constraint sets do. In the first band both sets at 8,400 draws and weight 40 score below tracks only; in the fourth, they are 21 and 17 points above it; in the last, with five ladders, every fit gets fewer than a quarter of the pairs right. The per-band differences between the two sets point both ways, but none is resolved on its own: every per-band interval of ours minus PCU's includes zero (the largest, +13.9 in z 13690 to 14690, runs from -1.7 to +30.4). This matches PCU's own finding that their fit gain did not carry over to their second Paris 4 band, where their certificate covers about half the pairs (PCU README).
+
+**All seven bands pooled** (173 ladders, 1,443 pairs; bands 1 and 2 were seen before, so this is reported, not decided on): ours at 8,400 draws and weight 40 minus PCU's at the same setting -0.1 (-3.9 to +4.1); ours minus tracks only +10.4 (+6.7 to +14.0); PCU's at the same setting minus tracks only +10.5 (+5.5 to +15.1).
+
+To score your own constraint file on these labels: on a GPU machine with villa at 6bbe6e2, fit it per band with `python e03_fit_pod.py --scroll PHercParis4 --z0 Z0 --z1 Z1 --ours your_relative_windings.json --runs A0,OURS_d8400_w40 --work DIR` (the file needs `"vc_pointcollections_json_version": "1"`; grids land in `DIR/runs/kaggle/<run>/grids_<run>.npz`); score each band with `Z0=Z0 Z1=Z1 python e03_correct_of_all.py --pcu path/to/vesuvius-scrolling human A0=DIR/runs/kaggle/A0/grids_A0.npz OURS=DIR/runs/kaggle/OURS_d8400_w40/grids_OURS_d8400_w40.npz --ref A0 --out band.json` (PCU's repo at release v1.1, 4f4997a); and pool the band files with `python e03_pool_bands.py band*.json --runs OURS --ref A0 --out pooled.json`. The per-band and pooled outputs are in `figures/e05/`; each fit's code versions, packages, input hashes, seed and command line are in `runs/p4_<band>_<run>/manifest.json` (bands named B3 to B7 in order of z).
 
 A note for anyone repeating this: villa's point-collection reader rejects a file without `"vc_pointcollections_json_version": "1"`. PCU's released Paris 4 fit input has no such key (their own job adds it), and the first run here fitted the PCU rows without any constraints, at tracks-only scores. `e03_fit_pod.py` now writes the key for every run; the log line `pcls: 0 cross-patch, N unattached` shows how many ladders the fitter loaded.
 
