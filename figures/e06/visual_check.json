@@ -1,0 +1,207 @@
+{
+ "protocol": "blind panels, answers ON / NEAR / OTHER / OFF (DECISION_LOG 2026-10-26)",
+ "reader": "Lutfiya Miller",
+ "date": "2026-10-26",
+ "panels": [
+  {
+   "panel": 1,
+   "band": "B3",
+   "fit": "OURS_d8400_w40_s2",
+   "ladder": 2,
+   "point": 1,
+   "lutfiya": "NEAR",
+   "exact_d": 4.37,
+   "exact": "on"
+  },
+  {
+   "panel": 2,
+   "band": "B3",
+   "fit": "PCU_d8400_w40",
+   "ladder": 4,
+   "point": 2,
+   "lutfiya": "ON",
+   "exact_d": 0.15,
+   "exact": "on"
+  },
+  {
+   "panel": 3,
+   "band": "B3",
+   "fit": "PCU_d8400_w40",
+   "ladder": 5,
+   "point": 1,
+   "lutfiya": "OFF",
+   "exact_d": 10.26,
+   "exact": "off"
+  },
+  {
+   "panel": 4,
+   "band": "B4",
+   "fit": "A0",
+   "ladder": 2,
+   "point": 2,
+   "lutfiya": "OFF",
+   "exact_d": 8.33,
+   "exact": "on"
+  },
+  {
+   "panel": 5,
+   "band": "B4",
+   "fit": "OURS_d8400_w40",
+   "ladder": 0,
+   "point": 20,
+   "lutfiya": "NEAR",
+   "exact_d": 4.76,
+   "exact": "on"
+  },
+  {
+   "panel": 6,
+   "band": "B4",
+   "fit": "OURS_d8400_w40_s2",
+   "ladder": 0,
+   "point": 20,
+   "lutfiya": "NEAR",
+   "exact_d": 4.91,
+   "exact": "on"
+  },
+  {
+   "panel": 7,
+   "band": "B4",
+   "fit": "PCU_d8400_w40_s2",
+   "ladder": 3,
+   "point": 2,
+   "lutfiya": "NEAR/ON",
+   "exact_d": 3.35,
+   "exact": "on"
+  },
+  {
+   "panel": 8,
+   "band": "B4",
+   "fit": "PCU_d8400_w40_s2",
+   "ladder": 10,
+   "point": 1,
+   "lutfiya": "NEAR",
+   "exact_d": 9.65,
+   "exact": "on"
+  },
+  {
+   "panel": 9,
+   "band": "B5",
+   "fit": "OURS_d8400_w40",
+   "ladder": 4,
+   "point": 5,
+   "lutfiya": "NEAR",
+   "exact_d": 9.83,
+   "exact": "on"
+  },
+  {
+   "panel": 10,
+   "band": "B5",
+   "fit": "OURS_d8400_w40_s2",
+   "ladder": 8,
+   "point": 9,
+   "lutfiya": "ON",
+   "exact_d": 0.3,
+   "exact": "on"
+  },
+  {
+   "panel": 11,
+   "band": "B5",
+   "fit": "PCU",
+   "ladder": 8,
+   "point": 1,
+   "lutfiya": "NEAR",
+   "exact_d": 5.24,
+   "exact": "on"
+  },
+  {
+   "panel": 12,
+   "band": "B5",
+   "fit": "PCU",
+   "ladder": 8,
+   "point": 10,
+   "lutfiya": "ON",
+   "exact_d": 2.64,
+   "exact": "on"
+  },
+  {
+   "panel": 13,
+   "band": "B5",
+   "fit": "PCU_d8400_w40",
+   "ladder": 12,
+   "point": 0,
+   "lutfiya": "NEAR",
+   "exact_d": 8.65,
+   "exact": "on"
+  },
+  {
+   "panel": 14,
+   "band": "B6",
+   "fit": "OURS_vote_d8400_w40",
+   "ladder": 14,
+   "point": 0,
+   "lutfiya": "NEAR/ON",
+   "exact_d": 3.97,
+   "exact": "on"
+  },
+  {
+   "panel": 15,
+   "band": "B7",
+   "fit": "OURS_d8400_w40",
+   "ladder": 0,
+   "point": 37,
+   "lutfiya": "ON",
+   "exact_d": 1.85,
+   "exact": "on"
+  },
+  {
+   "panel": 16,
+   "band": "B7",
+   "fit": "OURS_d8400_w40_s2",
+   "ladder": 2,
+   "point": 0,
+   "lutfiya": "NEAR",
+   "exact_d": 7.73,
+   "exact": "on"
+  },
+  {
+   "panel": 17,
+   "band": "B7",
+   "fit": "OURS_d8400_w40_s2",
+   "ladder": 2,
+   "point": 2,
+   "lutfiya": "NEAR",
+   "exact_d": 6.8,
+   "exact": "on"
+  },
+  {
+   "panel": 18,
+   "band": "B7",
+   "fit": "PCU",
+   "ladder": 2,
+   "point": 14,
+   "lutfiya": "NEAR",
+   "exact_d": 9.18,
+   "exact": "on"
+  },
+  {
+   "panel": 19,
+   "band": "B7",
+   "fit": "PCU_d8400_w40_s2",
+   "ladder": 0,
+   "point": 39,
+   "lutfiya": "ON",
+   "exact_d": 0.71,
+   "exact": "on"
+  },
+  {
+   "panel": 20,
+   "band": "B7",
+   "fit": "PCU_d8400_w40_s2",
+   "ladder": 2,
+   "point": 2,
+   "lutfiya": "NEAR",
+   "exact_d": 8.88,
+   "exact": "on"
+  }
+ ]
+}
