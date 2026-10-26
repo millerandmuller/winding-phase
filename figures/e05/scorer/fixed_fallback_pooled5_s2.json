@@ -1,0 +1,33 @@
+{
+ "bands": [
+  "fixed_fallback_counts_B3.json",
+  "fixed_fallback_counts_B4.json",
+  "fixed_fallback_counts_B5.json",
+  "fixed_fallback_counts_B6.json",
+  "fixed_fallback_counts_B7.json"
+ ],
+ "ladders": [
+  31,
+  18,
+  14,
+  35,
+  5
+ ],
+ "pairs": 837,
+ "ref": "PCU_d8400_w40_s2",
+ "PCU_d8400_w40_s2": {
+  "correct_of_all": 0.6690561529271206
+ },
+ "OURS_d8400_w40_s2": {
+  "correct_of_all": 0.7048984468339307,
+  "ci95": [
+   0.6574525118186478,
+   0.7452154799425925
+  ],
+  "diff_vs_ref": 0.03584229390681004,
+  "diff_ci95": [
+   -0.023257104509201702,
+   0.10604625852054825
+  ]
+ }
+}

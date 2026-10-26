@@ -1,0 +1,55 @@
+{
+ "z": [
+  16900,
+  17900
+ ],
+ "ladders": 5,
+ "fits": {
+  "OURS_d8400_w40": {
+   "as_written": {
+    "points_assigned": 35,
+    "points": 90,
+    "pairs_assigned": 16,
+    "pairs": 85,
+    "slips": 1,
+    "correct_of_all": 0.17647058823529413,
+    "per_ladder_assigned": [
+     7,
+     9,
+     0,
+     0,
+     0
+    ],
+    "per_ladder_slips": [
+     0,
+     1,
+     0,
+     0,
+     0
+    ]
+   },
+   "valid_cells": {
+    "points_assigned": 81,
+    "points": 90,
+    "pairs_assigned": 70,
+    "pairs": 85,
+    "slips": 10,
+    "correct_of_all": 0.7058823529411765,
+    "per_ladder_assigned": [
+     37,
+     15,
+     13,
+     0,
+     5
+    ],
+    "per_ladder_slips": [
+     4,
+     2,
+     2,
+     0,
+     2
+    ]
+   }
+  }
+ }
+}
