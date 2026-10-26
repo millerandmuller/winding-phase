@@ -1,0 +1,42 @@
+{
+ "bands": [
+  "exact_counts_B3.json",
+  "exact_counts_B4.json",
+  "exact_counts_B5.json",
+  "exact_counts_B6.json",
+  "exact_counts_B7.json"
+ ],
+ "ladders": [
+  31,
+  18,
+  14,
+  35,
+  5
+ ],
+ "pairs": 837,
+ "ref": "PCU_d8400_w40_s2",
+ "PCU_d8400_w40_s2": {
+  "correct_of_all": 0.6666666666666666,
+  "ci95": [
+   0.6023447667287725,
+   0.7222860143731404
+  ],
+  "diff_vs_ref": 0.0,
+  "diff_ci95": [
+   0.0,
+   0.0
+  ]
+ },
+ "OURS_d8400_w40_s2": {
+  "correct_of_all": 0.7144563918757467,
+  "ci95": [
+   0.6698507885876307,
+   0.7533153968552705
+  ],
+  "diff_vs_ref": 0.04778972520908009,
+  "diff_ci95": [
+   -0.008805865256336951,
+   0.11410456730769222
+  ]
+ }
+}
